@@ -1,7 +1,7 @@
 <idea-plugin>
-  <id>com.aegamesi.java_visualizer.plugin</id>
-  <name>Java Visualizer</name>
-  <vendor email="eli.lipsitz@gmail.com" url="https://github.com/elipsitz">Eli Lipsitz</vendor>
+  <id>be.unamur.java_visualizer.plugin</id>
+  <name>JavaViz</name>
+  <vendor email="xxxxxxxx" url="https://github.com/xxxxx">OOOOOOOOOOOOO</vendor>
 
   <description><![CDATA[
       A tool to visualize the call stack and objects on the heap (as a box and
@@ -18,7 +18,7 @@
   <depends>com.intellij.modules.java</depends>
 
   <projectListeners>
-    <listener class="com.aegamesi.java_visualizer.plugin.JavaVisualizerListener"
+    <listener class="be.unamur.java_visualizer.plugin.JavaVisualizerListener"
               topic="com.intellij.xdebugger.XDebuggerManagerListener"/>
   </projectListeners>
 
@@ -26,14 +26,14 @@
     <group id="JavaVisualizer.VisualizerToolbar" popup="false">
       <action
               id="JavaVisualizer.ZoomInAction"
-              class="com.aegamesi.java_visualizer.plugin.ZoomInAction"
+              class="be.unamur.java_visualizer.plugin.ZoomInAction"
               text="Zoom In"
               description="Zoom in visualizer"
               icon="/icons/magnify-plus.svg"
       />
       <action
               id="JavaVisualizer.ZoomOutAction"
-              class="com.aegamesi.java_visualizer.plugin.ZoomOutAction"
+              class="be.unamur.java_visualizer.plugin.ZoomOutAction"
               text="Zoom Out"
               description="Zoom out visualizer"
               icon="/icons/magnify-minus.svg"

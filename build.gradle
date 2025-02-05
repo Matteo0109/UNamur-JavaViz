@@ -1,28 +1,32 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.4.1'
+    id 'org.jetbrains.intellij' version '1.17.3' // Version stable du plugin IntelliJ
 }
 
-group 'com.aegamesi'
-version '2.2.1'
+group = 'be.unamur'
+version = '1.0'
 
-sourceCompatibility = 1.8
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile group: 'org.json', name: 'json', version: '20180813'
+    testImplementation 'junit:junit:4.13.2' // Dépendance pour les tests unitaires
+    implementation 'org.json:json:20240303' // Bibliothèque JSON
 }
 
 intellij {
-    version '2019.3.5'
-    sandboxDirectory = "${System.properties['user.home']}/Library/Caches/IntelliJIdea2019.3/plugins-sandbox/"
-    updateSinceUntilBuild false
-    plugins = ['java']
+    version = '2024.1.4' // Version stable de l'IDE Community Edition
+    type = 'IC' // Community Edition
+    plugins = ['java'] // Plugins requis
 }
 
 patchPluginXml {
+    sinceBuild = '241.*' // Correspond à la version 2023.2
+    untilBuild = '243.*'
 }
