@@ -78,8 +78,8 @@ public class VisualizationPanel extends JPanel {
     }
 
 	private void buildUI() {
-		JLabel labelStack = new CustomJLabel("Call Stack", JLabel.RIGHT);
-		JLabel labelHeap = new CustomJLabel("Objects", JLabel.LEFT);
+		JLabel labelStack = new CustomJLabel("Stack", JLabel.RIGHT);
+		JLabel labelHeap = new CustomJLabel("Heap", JLabel.LEFT);
 		labelStack.setForeground(Constants.colorText);
 		labelHeap.setForeground(Constants.colorText);
 		labelStack.setFont(fontTitle);

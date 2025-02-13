@@ -249,13 +249,21 @@ public class Tracer {
 				out.items.add(convertValue(ao.getValue(i)));
 			}
 			return out;
+			
 		} else if (obj instanceof StringReference) {
+			String strVal = ((StringReference) obj).value();
+
 			HeapPrimitive out = new HeapPrimitive();
 			out.type = HeapEntity.Type.PRIMITIVE;
+
+			// Le label qui apparaîtra en titre du cadre (ex. "String")
 			out.label = "String";
+
+			// On stocke la vraie valeur dans out.value
 			out.value = new Value();
 			out.value.type = Value.Type.STRING;
-			out.value.stringValue = ((StringReference) obj).value();
+			out.value.stringValue = strVal;
+
 			return out;
 		}
 
@@ -346,12 +354,12 @@ public class Tracer {
 			out.type = Value.Type.VOID;
 		} else if (!(v instanceof ObjectReference)) {
 			out.type = Value.Type.NULL;
-		} else if (v instanceof StringReference) {
-			out.type = Value.Type.STRING;
-			out.stringValue = ((StringReference) v).value();
+		} else if (v instanceof ObjectReference) {
+			// Qu'il s'agisse d'un StringReference ou d'un autre objet,
+			// on le traite comme un objet
+			out = convertReference((ObjectReference) v);
 		} else {
-			ObjectReference obj = (ObjectReference) v;
-			out = convertReference(obj);
+			out.type = Value.Type.NULL;
 		}
 		return out;
 	}

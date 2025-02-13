@@ -1,10 +1,6 @@
 package be.unamur.java_visualizer.ui;
 
-import be.unamur.java_visualizer.model.HeapEntity;
-import be.unamur.java_visualizer.model.HeapList;
-import be.unamur.java_visualizer.model.HeapMap;
-import be.unamur.java_visualizer.model.HeapObject;
-import be.unamur.java_visualizer.model.Value;
+import be.unamur.java_visualizer.model.*;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -40,9 +36,10 @@ class HeapEntityComponent extends JPanel {
 			mainPanel = new PanelList((HeapList) entity);
 		} else if (entity instanceof HeapMap) {
 			mainPanel = new PanelMap((HeapMap) entity);
+		} else if (entity instanceof HeapPrimitive) {
+			mainPanel = new PanelPrimitive((HeapPrimitive) entity);
 		}
-
-		if (mainPanel != null) {
+		if (mainPanel !=  null) {
 			add(mainPanel, BorderLayout.WEST);
 		}
 	}
@@ -138,5 +135,7 @@ class HeapEntityComponent extends JPanel {
 				g.drawLine(s + 1, 0, s + 1, getHeight() - 1);
 			}
 		}
+
+
 	}
 }
