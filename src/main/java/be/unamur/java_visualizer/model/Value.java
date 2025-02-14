@@ -11,6 +11,7 @@ public class Value {
 	public String stringValue;
 	public char charValue;
 	public long reference;
+	public String typeName;
 
 	@Override
 	public String toString() {

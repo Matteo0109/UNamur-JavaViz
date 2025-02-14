@@ -27,6 +27,6 @@ intellij {
 }
 
 patchPluginXml {
-    sinceBuild = '241.*' // Correspond à la version 2023.2
+    sinceBuild = '193.*' // Correspond à la version 2023.2
     untilBuild = '243.*'
 }

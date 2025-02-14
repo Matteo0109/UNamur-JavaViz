@@ -329,35 +329,46 @@ public class Tracer {
 		if (v instanceof BooleanValue) {
 			out.type = Value.Type.BOOLEAN;
 			out.booleanValue = ((BooleanValue) v).value();
+			out.typeName = "bool";
 		} else if (v instanceof ByteValue) {
 			out.type = Value.Type.LONG;
 			out.longValue = ((ByteValue) v).value();
+			out.typeName = "byte";
 		} else if (v instanceof ShortValue) {
 			out.type = Value.Type.LONG;
 			out.longValue = ((ShortValue) v).value();
+			out.typeName = "short";
 		} else if (v instanceof IntegerValue) {
 			out.type = Value.Type.LONG;
 			out.longValue = ((IntegerValue) v).value();
+			out.typeName = "int";
 		} else if (v instanceof LongValue) {
 			out.type = Value.Type.LONG;
 			out.longValue = ((LongValue) v).value();
+			out.typeName = "long";
 		} else if (v instanceof FloatValue) {
 			out.type = Value.Type.DOUBLE;
 			out.doubleValue = ((FloatValue) v).value();
+			out.typeName = "float";
 		} else if (v instanceof DoubleValue) {
 			out.type = Value.Type.DOUBLE;
 			out.doubleValue = ((DoubleValue) v).value();
+			out.typeName = "double";
 		} else if (v instanceof CharValue) {
             out.type = Value.Type.CHAR;
 			out.charValue = ((CharValue) v).value();
+			out.typeName = "char";
 		} else if (v instanceof VoidValue) {
 			out.type = Value.Type.VOID;
+			out.typeName = "void";
 		} else if (!(v instanceof ObjectReference)) {
 			out.type = Value.Type.NULL;
+			out.typeName = ((ObjectReference) v).referenceType().name();
 		} else if (v instanceof ObjectReference) {
 			// Qu'il s'agisse d'un StringReference ou d'un autre objet,
 			// on le traite comme un objet
 			out = convertReference((ObjectReference) v);
+			out.typeName = ((ObjectReference) v).referenceType().name();
 		} else {
 			out.type = Value.Type.NULL;
 		}

@@ -2,8 +2,7 @@ package be.unamur.java_visualizer.ui;
 
 import be.unamur.java_visualizer.model.*;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -52,47 +51,85 @@ class HeapEntityComponent extends JPanel {
 		return valueComponents;
 	}
 
-	private class PanelObject extends KVComponent {
+	private class PanelObject extends KTVComponent {
 		PanelObject(HeapObject e) {
-			List<JLabel> keys = new ArrayList<>();
-			List<ValueComponent> vals = new ArrayList<>();
+			// Trois listes pour les 3 colonnes
+			List<JComponent> typeComps = new ArrayList<>();
+			List<JComponent> keyComps  = new ArrayList<>();
+			List<JComponent> valComps  = new ArrayList<>();
+
 			for (Map.Entry<String, Value> local : e.fields.entrySet()) {
-				JLabel key = new CustomJLabel(local.getKey(), JLabel.RIGHT);
-				key.setFont(Constants.fontUI);
-				key.setForeground(Constants.colorText);
 
+				// -- 1) TYPE --
+				String typeName = (local.getValue().typeName != null)
+						? local.getValue().typeName
+						: "<?>";
+				JLabel typeLabel = new CustomJLabel(typeName, JLabel.LEFT);
+				typeLabel.setFont(Constants.fontUI);
+				typeLabel.setForeground(Constants.colorText);
+
+
+				// -- 2) KEY --
+				JLabel keyLabel = new CustomJLabel(local.getKey(), JLabel.RIGHT);
+				keyLabel.setFont(Constants.fontUI);
+				keyLabel.setForeground(Constants.colorText);
+
+				// -- 3) VALUE --
 				ValueComponent val = new ValueComponent(viz, local.getValue());
-				valueComponents.add(val);
-				keys.add(key);
-				vals.add(val);
+				valueComponents.add(val); // On l'ajoute à la liste globale pour pointerConnections
+
+				typeComps.add(typeLabel);
+				keyComps.add(keyLabel);
+				valComps.add(val);
 			}
 
 			setColors(Constants.colorHeapKey, Constants.colorHeapVal, Constants.colorHeapBorder);
 			setPadding(Constants.padHeapMap);
-			setComponents(keys, vals);
+
+			setComponents(typeComps, keyComps, valComps);
+
 			build();
 		}
 	}
 
-	private class PanelMap extends KVComponent {
+	private class PanelMap extends KTVComponent {
 		PanelMap(HeapMap e) {
-			List<ValueComponent> keys = new ArrayList<>();
-			List<ValueComponent> vals = new ArrayList<>();
+			// Trois listes pour les 3 colonnes
+			List<JComponent> typeComps = new ArrayList<>();
+			List<JComponent> keyComps  = new ArrayList<>();
+			List<JComponent> valComps  = new ArrayList<>();
+
 			for (HeapMap.Pair entry : e.pairs) {
-				ValueComponent key = new ValueComponent(viz, entry.key);
-				ValueComponent val = new ValueComponent(viz, entry.val);
-				valueComponents.add(val);
-				valueComponents.add(val);
-				keys.add(key);
-				vals.add(val);
+				// -- 1) TYPE --
+				String typeName = (entry.val.typeName != null)
+						? entry.val.typeName
+						: "<?>";
+				JLabel typeLabel = new CustomJLabel(typeName, JLabel.LEFT);
+				typeLabel.setFont(Constants.fontUI);
+				typeLabel.setForeground(Constants.colorText);
+
+				// -- 2) KEY --
+				ValueComponent keyComp = new ValueComponent(viz, entry.key);
+				valueComponents.add(keyComp);
+
+				// -- 3) VALUE --
+				ValueComponent valComp = new ValueComponent(viz, entry.val);
+				valueComponents.add(valComp);
+
+				typeComps.add(typeLabel);
+				keyComps.add(keyComp);
+				valComps.add(valComp);
 			}
 
 			setColors(Constants.colorHeapKey, Constants.colorHeapVal, Constants.colorHeapBorder);
 			setPadding(Constants.padHeapMap);
-			setComponents(keys, vals);
+
+			setComponents(typeComps, keyComps, valComps);
+
 			build();
 		}
 	}
+
 
 	private class PanelList extends JPanel {
 		private int[] splits;

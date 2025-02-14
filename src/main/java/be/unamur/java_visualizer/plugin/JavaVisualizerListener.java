@@ -14,6 +14,7 @@ public class JavaVisualizerListener implements XDebuggerManagerListener {
 
     @Override
     public void processStarted(@NotNull XDebugProcess debugProcess) {
+        System.out.println("JavaVisualizerListener : Debug process started.");
         new JavaVisualizerManager(project, debugProcess);
     }
 }
