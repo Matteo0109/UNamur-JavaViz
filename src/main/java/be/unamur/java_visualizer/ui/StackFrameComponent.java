@@ -79,7 +79,10 @@ class StackFrameComponent extends JPanel {
 
 		KTVComponent locals = new KTVComponent();
 		locals.setPadding(4);
-		locals.setDividerColor(Constants.colorHeapBorder);
+		locals.setColors(Constants.colorHeapKey,
+				Constants.colorHeapVal,
+				Constants.colorHeapVal,
+				Constants.colorHeapBorder);
 
 		// On passe les trois listes : type, nom, valeur
 		locals.setComponents(type, key, val);
