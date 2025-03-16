@@ -11,31 +11,62 @@ import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
 
 class MainPane extends JPanel {
-	private JLabel placeholderLabel;
-	private VisualizationPanel viz;
+    private JLabel placeholderLabel;
+    private JLabel sortModeLabel;
+    private VisualizationPanel viz;
+    private ExecutionTrace currentTrace;
 
-    private final float[] ZOOM_LEVELS = {0.25f, 0.333f, 0.5f, 0.666f, 0.75f, 0.8f, 0.9f, 1.0f, 1.1f, 1.25f, 1.5f, 1.75f, 2.0f, 2.5f, 3.0f, 4.0f};
+    private final float[] ZOOM_LEVELS = {
+            0.25f, 0.333f, 0.5f, 0.666f, 0.75f, 0.8f, 0.9f,
+            1.0f, 1.1f, 1.25f, 1.5f, 1.75f, 2.0f, 2.5f, 3.0f, 4.0f
+    };
 
-	MainPane() {
-		setLayout(new BorderLayout());
+    MainPane() {
+        setLayout(new BorderLayout());
 
-		String text = "No execution trace loaded: make sure you've stopped on a breakpoint.";
-		placeholderLabel = new JLabel(text, SwingConstants.CENTER);
-		add(placeholderLabel);
-	}
+        // Label pour informer l'utilisateur du mode de tri
+        sortModeLabel = new JLabel("Tri actuel : " + PluginSettings.getSortMode());
+        add(sortModeLabel, BorderLayout.NORTH);
 
-	void setTrace(ExecutionTrace trace) {
-		if (viz == null) {
-			remove(placeholderLabel);
-			viz = new VisualizationPanel();
+        String text = "No execution trace loaded: make sure you've stopped on a breakpoint.";
+        placeholderLabel = new JLabel(text, SwingConstants.CENTER);
+        add(placeholderLabel, BorderLayout.CENTER);
+    }
+
+    void setTrace(ExecutionTrace trace) {
+        //Mémorisation de la trace actuelle
+        this.currentTrace = trace;
+
+        // Met à jour le label du mode de tri (ex. ALPHABETICAL / FIFO / LIFO)
+        sortModeLabel.setText("Tri actuel : " + PluginSettings.getSortMode());
+
+        if (viz == null) {
+            remove(placeholderLabel);
+
+            viz = new VisualizationPanel();
             viz.setScale(getZoom());
-			JBScrollPane scrollPane = new JBScrollPane(viz);
-			scrollPane.setBorder(null);
-			add(scrollPane);
-			revalidate();
-		}
-		viz.setTrace(trace);
-	}
+
+            // On place le VisualizationPanel dans un JBScrollPane
+            JBScrollPane scrollPane = new JBScrollPane(viz);
+            scrollPane.setBorder(null);
+
+            // Important : on l'ajoute au CENTER pour qu'il prenne tout l'espace
+            add(scrollPane, BorderLayout.CENTER);
+
+            revalidate();
+        }
+        // On met à jour la trace affichée
+        viz.setTrace(trace);
+    }
+
+    // AJOUT : méthode pour réappliquer la dernière trace (rafraîchir l'affichage)
+    void refreshTrace() {
+        if (viz != null && currentTrace != null) {
+            viz.setTrace(currentTrace);
+            revalidate();
+            repaint();
+        }
+    }
 
     void zoom(int direction) {
         if (viz != null) {

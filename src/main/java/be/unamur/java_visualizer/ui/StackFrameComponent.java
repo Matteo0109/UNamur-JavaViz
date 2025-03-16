@@ -2,26 +2,23 @@ package be.unamur.java_visualizer.ui;
 
 import be.unamur.java_visualizer.model.Frame;
 import be.unamur.java_visualizer.model.Value;
+import be.unamur.java_visualizer.plugin.PluginSettings;    // Pour récupérer le mode de tri
+import be.unamur.java_visualizer.plugin.SortMode;         // Pour l'enum des modes de tri
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
+import javax.swing.*;
 import javax.swing.border.MatteBorder;
-import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-class StackFrameComponent extends JPanel {
+public class StackFrameComponent extends JPanel {
 	private Frame frame;
 	private VisualizationPanel viz;
 
-	StackFrameComponent(VisualizationPanel viz, Frame frame, boolean first) {
+	public StackFrameComponent(VisualizationPanel viz, Frame frame, boolean first) {
 		this.frame = frame;
 		this.viz = viz;
 
@@ -37,41 +34,56 @@ class StackFrameComponent extends JPanel {
 		labelName.setMaximumSize(Constants.maxDimension);
 		add(labelName);
 
+		// ---------------------
+		// AJOUT DU TRI DES VARIABLES
+		// ---------------------
+		// Récupération du mode de tri défini via SortVariablesAction (PluginSettings)
+		SortMode mode = PluginSettings.getSortMode();
+
+		// Conversion de la Map en liste pour pouvoir appliquer le tri
+		List<Map.Entry<String, Value>> localEntries = new ArrayList<>(frame.locals.entrySet());
+
+		// Appliquer le tri en fonction du mode choisi
+		switch (mode) {
+			case ALPHABETICAL:
+				localEntries.sort(Comparator.comparing(Map.Entry::getKey));
+				break;
+			case LIFO:
+				Collections.reverse(localEntries);
+				break;
+			case FIFO:
+				// FIFO : on conserve l'ordre d'insertion (frame.locals doit être un LinkedHashMap)
+				break;
+		}
+		// ---------------------
+
 		List<JComponent> type = new ArrayList<>();
 		List<JComponent> key = new ArrayList<>();
-		List<JComponent> val  = new ArrayList<>();
+		List<JComponent> val = new ArrayList<>();
 
-		for (Map.Entry<String, Value> local : frame.locals.entrySet()) {
-			Value v = local.getValue();
-
-			// TYPE de la variable
-			String typeName = (v.typeName != null) ? v.typeName : "<?>";
-
-			// On crée un label pour le type
+		// Parcours de la liste potentiellement réordonnée
+		for (Map.Entry<String, Value> local : localEntries) {
+			// TYPE
+			String typeName = (local.getValue().typeName != null)
+					? local.getValue().typeName
+					: "<?>";
 			JLabel typeLabel = new CustomJLabel(typeName, JLabel.LEFT);
 			typeLabel.setOpaque(true);
-
-			// Code couleur : on colorie le fond selon que c'est un primitif ou non
-			if (isPrimitive(v)) {
-				typeLabel.setBackground(new Color(0xFF, 0xEE, 0xCC)); // Couleur pour primitifs
-			} else {
-				typeLabel.setBackground(new Color(0xEE, 0xFF, 0xEE)); // Couleur pour objets
-			}
+			// Ne modifie rien ici (la logique de new Color reste inchangée)
+			typeLabel.setBackground(isPrimitive(local.getValue())
+					? new Color(0xFF, 0xEE, 0xCC)
+					: new Color(0xEE, 0xFF, 0xEE));
 			typeLabel.setFont(Constants.fontUI);
 			typeLabel.setForeground(Constants.colorText);
 
-			// NOM de la variable
+			// NAME
 			JLabel localLabel = new CustomJLabel(local.getKey(), JLabel.RIGHT);
-			localLabel.setForeground(Constants.colorText);
 			localLabel.setFont(Constants.fontUI);
+			localLabel.setForeground(Constants.colorText);
 
-			// VALEUR
-			ValueComponent value = new ValueComponent(viz, v, first);
-			Border b1 = new MatteBorder(0, 1, 1, 0, Constants.colorFrameOutline);
-			Border b2 = BorderFactory.createEmptyBorder(2, 2, 2, 2);
-			value.setBorder(new CompoundBorder(b1, b2));
+			// VALUE
+			ValueComponent value = new ValueComponent(viz, local.getValue(), first);
 
-			// On ajoute chaque composant dans la liste qui correspond
 			type.add(typeLabel);
 			key.add(localLabel);
 			val.add(value);
@@ -79,12 +91,12 @@ class StackFrameComponent extends JPanel {
 
 		KTVComponent locals = new KTVComponent();
 		locals.setPadding(4);
-		locals.setColors(Constants.colorHeapKey,
+		locals.setColors(
+				Constants.colorHeapKey,
 				Constants.colorHeapVal,
 				Constants.colorHeapVal,
-				Constants.colorHeapBorder);
-
-		// On passe les trois listes : type, nom, valeur
+				Constants.colorHeapBorder
+		);
 		locals.setComponents(type, key, val);
 		locals.build();
 
@@ -96,7 +108,6 @@ class StackFrameComponent extends JPanel {
 		return Constants.maxDimension;
 	}
 
-	// Méthode pour savoir si une valeur est un primitif
 	private boolean isPrimitive(Value v) {
 		switch (v.type) {
 			case LONG:

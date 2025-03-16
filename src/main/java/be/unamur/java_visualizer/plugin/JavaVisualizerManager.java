@@ -27,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.event.AncestorEvent;
 
 public class JavaVisualizerManager implements XDebugSessionListener {
+	private static JavaVisualizerManager instance;  // Pour accéder au manager depuis SortVariablesAction
+
 	private static final String CONTENT_ID = "aegamesi.JavaVisualizerContent2";
 
 	static final String PROPERTY_KEY_BASE = "java_visualizer.";
@@ -38,6 +40,7 @@ public class JavaVisualizerManager implements XDebugSessionListener {
 	private Project project;
 
 	JavaVisualizerManager(Project project, XDebugProcess debugProcess) {
+		instance = this;  // Stocke l’instance courante
 		this.project = project;
 		this.debugSession = debugProcess.getSession();
 		this.content = null;
@@ -108,7 +111,7 @@ public class JavaVisualizerManager implements XDebugSessionListener {
 		}
 	}
 
-	private void forceRefreshVisualizer() {
+	public void forceRefreshVisualizer() {
 		try {
 			DebugProcess p = DebuggerManager.getInstance(project).getDebugProcess(debugSession.getDebugProcess().getProcessHandler());
 			if (p != null) {
@@ -141,5 +144,9 @@ public class JavaVisualizerManager implements XDebugSessionListener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static JavaVisualizerManager getInstance() {
+		return instance;
 	}
 }

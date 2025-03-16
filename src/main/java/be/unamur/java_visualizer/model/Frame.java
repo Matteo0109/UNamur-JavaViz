@@ -3,13 +3,15 @@ package be.unamur.java_visualizer.model;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class Frame {
 	public String name;
 	public boolean internal;
-	public Map<String, Value> locals = new TreeMap<>();
+	public Map<String, Value> locals = new LinkedHashMap<>();
+
 
 	JSONObject toJson() {
 		JSONObject o = new JSONObject();
