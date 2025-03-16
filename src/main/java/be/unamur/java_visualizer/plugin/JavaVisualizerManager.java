@@ -136,7 +136,7 @@ public class JavaVisualizerManager implements XDebugSessionListener {
 			}
 			ThreadReference thread = sc.getThread().getThreadReference();
 
-			Tracer t = new Tracer(thread);
+			Tracer t = new Tracer(thread, panel);
 			panel.setTrace(t.getModel());
 		} catch (Exception e) {
 			e.printStackTrace();

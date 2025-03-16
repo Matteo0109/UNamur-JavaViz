@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
 
-class MainPane extends JPanel {
+public class MainPane extends JPanel {
 	private JLabel placeholderLabel;
 	private VisualizationPanel viz;
 
@@ -60,4 +60,9 @@ class MainPane extends JPanel {
     private float getZoom() {
         return PropertiesComponent.getInstance().getFloat(JavaVisualizerManager.KEY_ZOOM, 1.0f);
     }
+
+    public VisualizationPanel getVisualizationPanel() {
+        return this.viz;
+    }
+
 }

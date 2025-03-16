@@ -8,6 +8,7 @@ import be.unamur.java_visualizer.model.HeapMap;
 import be.unamur.java_visualizer.model.HeapObject;
 import be.unamur.java_visualizer.model.HeapPrimitive;
 import be.unamur.java_visualizer.model.Value;
+import be.unamur.java_visualizer.plugin.MainPane;
 import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.ArrayReference;
 import com.sun.jdi.BooleanValue;
@@ -29,15 +30,11 @@ import com.sun.jdi.StackFrame;
 import com.sun.jdi.StringReference;
 import com.sun.jdi.ThreadReference;
 import com.sun.jdi.VoidValue;
+import com.sun.jdi.Method;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+
+
+import java.util.*;
 
 import static be.unamur.java_visualizer.backend.TracerUtils.displayNameForType;
 import static be.unamur.java_visualizer.backend.TracerUtils.doesImplementInterface;
@@ -65,6 +62,7 @@ public class Tracer {
 	private static final List<ReferenceType> STATIC_LISTABLE = new ArrayList<>();
 
 	private ThreadReference thread;
+	private MainPane panel;
 	private ExecutionTrace model;
 
 	/*
@@ -74,10 +72,10 @@ public class Tracer {
 	*/
 	private TreeMap<Long, ObjectReference> pendingConversion = new TreeMap<>();
 
-	public Tracer(ThreadReference thread) {
+	public Tracer(ThreadReference thread, MainPane panel) {
 		this.thread = thread;
+		this.panel = panel;
 	}
-
 	public ExecutionTrace getModel() throws IncompatibleThreadStateException {
 		model = new ExecutionTrace();
 
@@ -237,91 +235,103 @@ public class Tracer {
 	}
 
 	private HeapEntity convertObject(ObjectReference obj) {
-		if (obj instanceof ArrayReference) {
-			ArrayReference ao = (ArrayReference) obj;
-			int length = ao.length();
+		boolean isAbstract = panel.getVisualizationPanel().isAbstractView();
 
-			HeapList out = new HeapList();
-			out.type = HeapEntity.Type.LIST;
-			out.label = ao.type().name();
-			for (int i = 0; i < length; i++) {
-				// TODO: optional feature, skip runs of zeros
-				out.items.add(convertValue(ao.getValue(i)));
+		if (isAbstract) {
+			HeapObject heapObj = new HeapObject();
+			// Récupération de la vraie chaîne via toString() dans la VM
+			String summary = getRealToString(obj, thread);
+			heapObj.setAbstractSummary(summary);
+			heapObj.id = obj.uniqueID();
+			return heapObj;
+		} else {
+
+			if (obj instanceof ArrayReference) {
+				ArrayReference ao = (ArrayReference) obj;
+				int length = ao.length();
+
+				HeapList out = new HeapList();
+				out.type = HeapEntity.Type.LIST;
+				out.label = ao.type().name();
+				for (int i = 0; i < length; i++) {
+					// TODO: optional feature, skip runs of zeros
+					out.items.add(convertValue(ao.getValue(i)));
+				}
+				return out;
+
+			} else if (obj instanceof StringReference) {
+				String strVal = ((StringReference) obj).value();
+
+				HeapPrimitive out = new HeapPrimitive();
+				out.type = HeapEntity.Type.PRIMITIVE;
+
+				// Le label qui apparaîtra en titre du cadre (ex. "String")
+				out.label = "String";
+
+				// On stocke la vraie valeur dans out.value
+				out.value = new Value();
+				out.value.type = Value.Type.STRING;
+				out.value.stringValue = strVal;
+
+				return out;
 			}
-			return out;
-			
-		} else if (obj instanceof StringReference) {
-			String strVal = ((StringReference) obj).value();
 
-			HeapPrimitive out = new HeapPrimitive();
-			out.type = HeapEntity.Type.PRIMITIVE;
+			String typeName = obj.referenceType().name();
+			if ((doesImplementInterface(obj, "java.util.List")
+					|| doesImplementInterface(obj, "java.util.Set"))
+					&& isInternalPackage(typeName)) {
+				HeapList out = new HeapList();
+				out.type = HeapEntity.Type.LIST; // XXX: or SET
+				out.label = displayNameForType(obj);
+				Iterator<com.sun.jdi.Value> i = getIterator(thread, obj);
+				while (i.hasNext()) {
+					out.items.add(convertValue(i.next()));
+				}
+				return out;
+			}
 
-			// Le label qui apparaîtra en titre du cadre (ex. "String")
-			out.label = "String";
+			if (doesImplementInterface(obj, "java.util.Map") && isInternalPackage(typeName)) {
+				HeapMap out = new HeapMap();
+				out.type = HeapEntity.Type.MAP;
+				out.label = displayNameForType(obj);
 
-			// On stocke la vraie valeur dans out.value
-			out.value = new Value();
-			out.value.type = Value.Type.STRING;
-			out.value.stringValue = strVal;
+				ObjectReference entrySet = (ObjectReference) invokeSimple(thread, obj, "entrySet");
+				Iterator<com.sun.jdi.Value> i = getIterator(thread, entrySet);
+				while (i.hasNext()) {
+					ObjectReference entry = (ObjectReference) i.next();
+					HeapMap.Pair pair = new HeapMap.Pair();
+					pair.key = convertValue(invokeSimple(thread, entry, "getKey"));
+					pair.val = convertValue(invokeSimple(thread, entry, "getValue"));
+					out.pairs.add(pair);
+				}
+				return out;
+			}
 
-			return out;
-		}
-
-		String typeName = obj.referenceType().name();
-		if ((doesImplementInterface(obj, "java.util.List")
-				|| doesImplementInterface(obj, "java.util.Set"))
-				&& isInternalPackage(typeName)) {
-			HeapList out = new HeapList();
-			out.type = HeapEntity.Type.LIST; // XXX: or SET
+			// now, arbitrary objects
+			HeapObject out = new HeapObject();
+			out.type = HeapEntity.Type.OBJECT;
 			out.label = displayNameForType(obj);
-			Iterator<com.sun.jdi.Value> i = getIterator(thread, obj);
-			while (i.hasNext()) {
-				out.items.add(convertValue(i.next()));
-			}
-			return out;
-		}
 
-		if (doesImplementInterface(obj, "java.util.Map") && isInternalPackage(typeName)) {
-			HeapMap out = new HeapMap();
-			out.type = HeapEntity.Type.MAP;
-			out.label = displayNameForType(obj);
+			ReferenceType refType = obj.referenceType();
 
-			ObjectReference entrySet = (ObjectReference) invokeSimple(thread, obj, "entrySet");
-			Iterator<com.sun.jdi.Value> i = getIterator(thread, entrySet);
-			while (i.hasNext()) {
-				ObjectReference entry = (ObjectReference) i.next();
-				HeapMap.Pair pair = new HeapMap.Pair();
-				pair.key = convertValue(invokeSimple(thread, entry, "getKey"));
-				pair.val = convertValue(invokeSimple(thread, entry, "getValue"));
-				out.pairs.add(pair);
-			}
-			return out;
-		}
-
-		// now, arbitrary objects
-		HeapObject out = new HeapObject();
-		out.type = HeapEntity.Type.OBJECT;
-		out.label = displayNameForType(obj);
-
-		ReferenceType refType = obj.referenceType();
-
-		if (shouldShowDetails(refType)) {
-			// fields: -inherited -hidden +synthetic
-			// visibleFields: +inherited -hidden +synthetic
-			// allFields: +inherited +hidden +repeated_synthetic
-			Map<Field, com.sun.jdi.Value> fields = obj.getValues(
-					SHOW_ALL_FIELDS ? refType.allFields() : refType.visibleFields()
-			);
-			for (Map.Entry<Field, com.sun.jdi.Value> me : fields.entrySet()) {
-				if (!me.getKey().isStatic() && (SHOW_ALL_FIELDS || !me.getKey().isSynthetic())) {
-					String name = SHOW_ALL_FIELDS ? me.getKey().declaringType().name() + "." : "";
-					name += me.getKey().name();
-					Value value = convertValue(me.getValue());
-					out.fields.put(name, value);
+			if (shouldShowDetails(refType)) {
+				// fields: -inherited -hidden +synthetic
+				// visibleFields: +inherited -hidden +synthetic
+				// allFields: +inherited +hidden +repeated_synthetic
+				Map<Field, com.sun.jdi.Value> fields = obj.getValues(
+						SHOW_ALL_FIELDS ? refType.allFields() : refType.visibleFields()
+				);
+				for (Map.Entry<Field, com.sun.jdi.Value> me : fields.entrySet()) {
+					if (!me.getKey().isStatic() && (SHOW_ALL_FIELDS || !me.getKey().isSynthetic())) {
+						String name = SHOW_ALL_FIELDS ? me.getKey().declaringType().name() + "." : "";
+						name += me.getKey().name();
+						Value value = convertValue(me.getValue());
+						out.fields.put(name, value);
+					}
 				}
 			}
+			return out;
 		}
-		return out;
 	}
 
 	private Value convertValue(com.sun.jdi.Value v) {
@@ -388,4 +398,50 @@ public class Tracer {
 	private static boolean shouldShowDetails(ReferenceType type) {
 		return !isInternalPackage(type.name());
 	}
+
+	private String getRealToString(ObjectReference obj, ThreadReference thread) {
+		try {
+			List<Method> toStringMethods = obj.referenceType().methodsByName("toString", "()Ljava/lang/String;");
+			if (!toStringMethods.isEmpty()) {
+				Method m = toStringMethods.get(0);
+
+				// Invocation de toString() dans la VM.
+				com.sun.jdi.Value retVal = obj.invokeMethod(
+						thread, m,
+						Collections.emptyList(),
+						ObjectReference.INVOKE_SINGLE_THREADED);
+				if (retVal instanceof StringReference) {
+					return ((StringReference) retVal).value();
+				}
+			}
+		} catch (Exception e) {
+			// En cas d'erreur, on renvoie un fallback.
+			return obj.toString();
+		}
+		// Si aucune méthode trouvée, fallback :
+		return obj.toString();
+	}
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
