@@ -36,11 +36,14 @@ public class JavaVisualizerManager implements XDebugSessionListener {
 	private Content content;
 	private MainPane panel;
 	private Project project;
+	private static JavaVisualizerManager instance;
+	private String affichageMode = "concret";
 
 	JavaVisualizerManager(Project project, XDebugProcess debugProcess) {
 		this.project = project;
 		this.debugSession = debugProcess.getSession();
 		this.content = null;
+		instance = this;
 
 		debugProcess.getProcessHandler().addProcessListener(new ProcessListener() {
 			@Override
@@ -108,7 +111,7 @@ public class JavaVisualizerManager implements XDebugSessionListener {
 		}
 	}
 
-	private void forceRefreshVisualizer() {
+	public void forceRefreshVisualizer() {
 		try {
 			DebugProcess p = DebuggerManager.getInstance(project).getDebugProcess(debugSession.getDebugProcess().getProcessHandler());
 			if (p != null) {
@@ -141,5 +144,19 @@ public class JavaVisualizerManager implements XDebugSessionListener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static JavaVisualizerManager getInstance() {
+		return instance;
+	}
+
+	public void setAffichageMode(String mode) {
+		this.affichageMode = mode;
+		// Met à jour la propriété dans la VisualizationPanel.
+		panel.getVisualizationPanel().setAbstractView("abstrait".equals(mode));
+	}
+
+	public String getAffichageMode() {
+		return affichageMode;
 	}
 }

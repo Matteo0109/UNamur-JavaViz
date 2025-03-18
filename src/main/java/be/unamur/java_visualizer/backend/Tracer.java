@@ -238,12 +238,22 @@ public class Tracer {
 		boolean isAbstract = panel.getVisualizationPanel().isAbstractView();
 
 		if (isAbstract) {
-			HeapObject heapObj = new HeapObject();
-			// Récupération de la vraie chaîne via toString() dans la VM
-			String summary = getRealToString(obj, thread);
-			heapObj.setAbstractSummary(summary);
-			heapObj.id = obj.uniqueID();
-			return heapObj;
+
+
+			// On renvoie un HeapPrimitive (comme si c'était un String) pour que l'affichage soit identique
+			// à un "vrai" String.
+			HeapPrimitive asString = new HeapPrimitive();
+			asString.type = HeapEntity.Type.PRIMITIVE;
+			asString.label = displayNameForType(obj);
+			asString.id = obj.uniqueID();
+
+			// On stocke la vraie valeur toString() dans asString.value
+			Value val = new Value();
+			val.type = Value.Type.STRING;
+			val.stringValue = getRealToString(obj, thread);
+			asString.value = val;
+
+			return asString;
 		} else {
 
 			if (obj instanceof ArrayReference) {

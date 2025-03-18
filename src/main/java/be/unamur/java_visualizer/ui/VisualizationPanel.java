@@ -2,6 +2,7 @@ package be.unamur.java_visualizer.ui;
 
 import be.unamur.java_visualizer.model.ExecutionTrace;
 import be.unamur.java_visualizer.model.Value;
+import be.unamur.java_visualizer.plugin.JavaVisualizerManager;
 import com.intellij.ui.JBColor;
 
 import javax.swing.*;
@@ -28,8 +29,6 @@ public class VisualizationPanel extends JPanel {
 
 	// Attribut indiquant si l'affichage doit être abstrait (true) ou concret (false)
 	private boolean abstractView = false;
-	// Position et dimensions du sélecteur de type
-	private final int TOGGLE_X = 350, TOGGLE_Y = 10, TOGGLE_WIDTH = 150, TOGGLE_HEIGHT = 30;
 
 	private static final int MARGIN = 10;
 	private static final int LINE_HEIGHT = 30;
@@ -60,8 +59,7 @@ public class VisualizationPanel extends JPanel {
 			}
 		});
 
-		// Ajout initial du sélecteur
-		addToggleButton();
+
 		// Construction initiale de l'interface
 		buildUI();
 	}
@@ -90,9 +88,7 @@ public class VisualizationPanel extends JPanel {
 	private void refreshUI() {
         referenceComponents.clear();
         removeAll();
-		addToggleButton();
         buildUI();
-
         revalidate();
         repaint();
     }
@@ -130,13 +126,10 @@ public class VisualizationPanel extends JPanel {
 		Dimension sizeHeap = heapPanel.getPreferredSize();
 		int stackWidth = Math.max(labelStack.getPreferredSize().width, sizeStack.width);
 		int heapWidth = Math.max(labelHeap.getPreferredSize().width, sizeHeap.width);
-		labelStack.setBounds(padOuter, padOuter + TOGGLE_Y, stackWidth, labelHeight);
-		labelHeap.setBounds(padOuter + stackWidth + padCenter, padOuter + TOGGLE_Y, heapWidth, labelHeight);
+		labelStack.setBounds(padOuter, padOuter, stackWidth, labelHeight);
+		labelHeap.setBounds(padOuter + stackWidth + padCenter, padOuter, heapWidth, labelHeight);
 		stackPanel.setBounds(padOuter, padOuter + labelHeight + padTitle, stackWidth, sizeStack.height);
 		heapPanel.setBounds(padOuter + stackWidth + padCenter, padOuter + labelHeight + padTitle, heapWidth, sizeHeap.height);
-
-		//Affichage du type abstrait ou concret
-		modeLabel.setBounds(TOGGLE_X + TOGGLE_WIDTH + MARGIN, TOGGLE_Y, 150, LINE_HEIGHT);
 
 		int outerWidth = (padOuter * 2) + stackWidth + padCenter + heapWidth;
         int outerHeight = (padOuter * 2) + labelHeight + padTitle + Math.max(sizeStack.height, sizeHeap.height);
@@ -219,41 +212,6 @@ public class VisualizationPanel extends JPanel {
 			pointerConnections.add(selected);
 		}
 		return selected;
-	}
-
-	// Méthode d'ajout du sélecteur de type d'affichage
-	private void addToggleButton() {
-		JToggleButton viewToggle = new JToggleButton(
-				abstractView ? "Type Abstrait" : "Type Concret",
-				abstractView);
-		viewToggle.setBounds(TOGGLE_X, TOGGLE_Y, TOGGLE_WIDTH, TOGGLE_HEIGHT);
-		viewToggle.setSize(viewToggle.getPreferredSize());
-
-		viewToggle.setOpaque(true);
-		viewToggle.setBackground(JBColor.WHITE);
-		viewToggle.setFont(fontUI);
-
-		viewToggle.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				boolean selected = viewToggle.isSelected();
-				setAbstractView(selected);
-				viewToggle.setText(selected ? "Type Abstrait" : "Type Concret");
-			}
-		});
-		add(viewToggle);
-	}
-
-
-	// Exemple de méthodes de conversion (à adapter selon votre logique) TODO
-	public String convertToConcrete(Object obj) {
-		// Retourne la représentation détaillée (concrète) de l'objet
-		return "Détails Concrets de " + obj.toString();
-	}
-
-	public String convertToAbstract(Object obj) {
-		// Retourne un résumé ou le type abstrait de l'objet
-		return "Type Abstrait de " + obj.getClass().getSimpleName();
 	}
 
 }
