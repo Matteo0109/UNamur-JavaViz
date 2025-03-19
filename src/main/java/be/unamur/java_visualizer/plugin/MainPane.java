@@ -91,4 +91,9 @@ class MainPane extends JPanel {
     private float getZoom() {
         return PropertiesComponent.getInstance().getFloat(JavaVisualizerManager.KEY_ZOOM, 1.0f);
     }
+
+    public VisualizationPanel getVisualizationPanel() {
+        return this.viz;
+    }
+
 }

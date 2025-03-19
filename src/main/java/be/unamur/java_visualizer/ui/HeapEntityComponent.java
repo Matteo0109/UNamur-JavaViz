@@ -53,42 +53,61 @@ class HeapEntityComponent extends JPanel {
 
 	private class PanelObject extends KTVComponent {
 		PanelObject(HeapObject e) {
-			// Trois listes pour les 3 colonnes
-			List<JComponent> typeComps = new ArrayList<>();
-			List<JComponent> keyComps  = new ArrayList<>();
-			List<JComponent> valComps  = new ArrayList<>();
+			super();
 
-			for (Map.Entry<String, Value> local : e.fields.entrySet()) {
+			if (viz.isAbstractView()) {
+				// Mode abstrait : afficher uniquement le résumé de l'objet (toString)
+				setLayout(new BorderLayout());
 
-				// -- 1) TYPE --
-				String typeName = (local.getValue().typeName != null)
-						? local.getValue().typeName
-						: "<?>";
-				JLabel typeLabel = new CustomJLabel(typeName, JLabel.LEFT);
-				typeLabel.setFont(Constants.fontUI);
-				typeLabel.setForeground(Constants.colorText);
+				CustomJLabel summaryLabel = new CustomJLabel(e.toString());
+				summaryLabel.setFont(Constants.fontUI);
+				summaryLabel.setForeground(Constants.colorText);
+				summaryLabel.setOpaque(true);
+				summaryLabel.setBackground(Constants.colorHeapVal);
+
+				add(summaryLabel, BorderLayout.CENTER);
+			} else {
+				// Mode concret : afficher les champs de l'objet
+
+				// Trois listes pour les 3 colonnes
+				List<JComponent> typeComps = new ArrayList<>();
+				List<JComponent> keyComps  = new ArrayList<>();
+				List<JComponent> valComps  = new ArrayList<>();
+
+				for (Map.Entry<String, Value> local : e.fields.entrySet()) {
+
+					// -- 1) TYPE --
+					String typeName = (local.getValue().typeName != null)
+							? local.getValue().typeName
+							: "<?>";
+					JLabel typeLabel = new CustomJLabel(typeName, JLabel.LEFT);
+					typeLabel.setFont(Constants.fontUI);
+					typeLabel.setForeground(Constants.colorText);
 
 
-				// -- 2) KEY --
-				JLabel keyLabel = new CustomJLabel(local.getKey(), JLabel.RIGHT);
-				keyLabel.setFont(Constants.fontUI);
-				keyLabel.setForeground(Constants.colorText);
+					// -- 2) KEY --
+					JLabel keyLabel = new CustomJLabel(local.getKey(), JLabel.RIGHT);
+					keyLabel.setFont(Constants.fontUI);
+					keyLabel.setForeground(Constants.colorText);
 
-				// -- 3) VALUE --
-				ValueComponent val = new ValueComponent(viz, local.getValue());
-				valueComponents.add(val); // On l'ajoute à la liste globale pour pointerConnections
+					// -- 3) VALUE --
+					ValueComponent val = new ValueComponent(viz, local.getValue());
+					valueComponents.add(val); // On l'ajoute à la liste globale pour pointerConnections
 
-				typeComps.add(typeLabel);
-				keyComps.add(keyLabel);
-				valComps.add(val);
+					typeComps.add(typeLabel);
+					keyComps.add(keyLabel);
+					valComps.add(val);
+				}
+				setComponents(typeComps, keyComps, valComps);
+
+				setColors(Constants.colorHeapKey, Constants.colorHeapVal, Constants.colorHeapVal, Constants.colorHeapBorder);
+				setPadding(Constants.padHeapMap);
+
+
+				build();
+
 			}
 
-			setColors(Constants.colorHeapKey, Constants.colorHeapVal, Constants.colorHeapVal, Constants.colorHeapBorder);
-			setPadding(Constants.padHeapMap);
-
-			setComponents(typeComps, keyComps, valComps);
-
-			build();
 		}
 	}
 
@@ -129,7 +148,6 @@ class HeapEntityComponent extends JPanel {
 			build();
 		}
 	}
-
 
 	private class PanelList extends JPanel {
 		private int[] splits;

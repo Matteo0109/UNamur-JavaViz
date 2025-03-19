@@ -44,6 +44,14 @@
               text="Trier Variables"
               description="Choisissez le mode de tri pour les variables de la stack"
       />
+      <action
+              id="be.unamur.java_visualizer.plugin.ShowSettingsAction"
+              class="be.unamur.java_visualizer.plugin.ShowSettingsAction"
+              text="Settings"
+              description="Ouvrir la fenêtre de configuration">
+
+        <add-to-group group-id="JavaVisualizer.VisualizerToolbar" anchor="last"/>
+      </action>
     </group>
   </actions>
 

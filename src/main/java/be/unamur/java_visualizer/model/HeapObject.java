@@ -8,6 +8,8 @@ import java.util.TreeMap;
 
 public class HeapObject extends HeapEntity {
 	public Map<String, Value> fields = new TreeMap<>();
+	private String abstractSummary; // pour stocker le résultat de toString() réel
+
 
 	@Override
 	public boolean hasSameStructure(HeapEntity other) {
@@ -34,5 +36,24 @@ public class HeapObject extends HeapEntity {
 			e.fields.put(keys.getString(i), Value.fromJson(vals.getJSONArray(i)));
 		}
 		return e;
+	}
+
+
+	public void setAbstractSummary(String s) {
+		this.abstractSummary = s;
+	}
+
+	public String getAbstractSummary() {
+		return abstractSummary;
+	}
+
+	@Override
+	public String toString() {
+		// Si le résumé abstrait a été défini, le retourner
+		if (abstractSummary != null) {
+			return abstractSummary;
+		}
+		// Sinon, renvoyer par défaut le label (ou un autre fallback)
+		return label;
 	}
 }

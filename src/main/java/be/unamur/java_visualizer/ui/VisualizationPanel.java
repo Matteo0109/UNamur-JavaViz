@@ -2,14 +2,13 @@ package be.unamur.java_visualizer.ui;
 
 import be.unamur.java_visualizer.model.ExecutionTrace;
 import be.unamur.java_visualizer.model.Value;
+import be.unamur.java_visualizer.plugin.JavaVisualizerManager;
+import com.intellij.ui.JBColor;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -26,8 +25,14 @@ public class VisualizationPanel extends JPanel {
 	private List<PointerConnection> pointerConnections;
 	private StackPanel stackPanel;
 	private HeapPanel heapPanel;
-
 	private PointerConnection selectedPointer;
+
+	// Attribut indiquant si l'affichage doit être abstrait (true) ou concret (false)
+	private boolean abstractView = false;
+
+	private static final int MARGIN = 10;
+	private static final int LINE_HEIGHT = 30;
+
 
 	public VisualizationPanel() {
 		setBackground(colorBackground);
@@ -53,6 +58,10 @@ public class VisualizationPanel extends JPanel {
 				}
 			}
 		});
+
+
+		// Construction initiale de l'interface
+		buildUI();
 	}
 
     public void setTrace(ExecutionTrace t) {
@@ -67,17 +76,37 @@ public class VisualizationPanel extends JPanel {
         }
     }
 
-    private void refreshUI() {
+	public void setAbstractView(boolean mode) {
+		this.abstractView = mode;
+		refreshUI();
+	}
+
+	public boolean isAbstractView() {
+		return abstractView;
+	}
+
+	private void refreshUI() {
         referenceComponents.clear();
         removeAll();
-
         buildUI();
-
         revalidate();
         repaint();
     }
 
 	private void buildUI() {
+		if (trace == null) {
+			JLabel noTraceLabel = new JLabel("Aucun trace à afficher pour l'instant");
+			noTraceLabel.setBounds(10, 10, 200, 30);
+			add(noTraceLabel);
+			return;
+		}
+
+		// Type abstrait ou type concret
+		String labelText = abstractView ? "Affichage Type Abstrait" : "Affichage Type Concret";
+		JLabel modeLabel = new CustomJLabel(abstractView ? "Affichage Abstrait" : "Affichage Concret", JLabel.LEFT);
+		modeLabel.setFont(Constants.fontUI);
+		add(modeLabel);
+
 		JLabel labelStack = new CustomJLabel("Stack", JLabel.RIGHT);
 		JLabel labelHeap = new CustomJLabel("Heap", JLabel.LEFT);
 		labelStack.setForeground(Constants.colorText);
@@ -102,7 +131,7 @@ public class VisualizationPanel extends JPanel {
 		stackPanel.setBounds(padOuter, padOuter + labelHeight + padTitle, stackWidth, sizeStack.height);
 		heapPanel.setBounds(padOuter + stackWidth + padCenter, padOuter + labelHeight + padTitle, heapWidth, sizeHeap.height);
 
-        int outerWidth = (padOuter * 2) + stackWidth + padCenter + heapWidth;
+		int outerWidth = (padOuter * 2) + stackWidth + padCenter + heapWidth;
         int outerHeight = (padOuter * 2) + labelHeight + padTitle + Math.max(sizeStack.height, sizeHeap.height);
         setPreferredSize(new Dimension((int) (outerWidth * scale), (int) (outerHeight * scale)));
 	}
@@ -184,4 +213,5 @@ public class VisualizationPanel extends JPanel {
 		}
 		return selected;
 	}
+
 }
