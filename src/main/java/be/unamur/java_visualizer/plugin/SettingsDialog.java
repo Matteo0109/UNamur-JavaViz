@@ -13,20 +13,35 @@ public class SettingsDialog extends DialogWrapper {
     private JComboBox<String> affichageCombo;
     private JComboBox<String> pileCombo;
 
-    // TODO sens de la pile
-
     public SettingsDialog() {
         super(true); // true pour activer les boutons OK et Annuler
         init();
         setTitle("Paramètres d'affichage");
 
-        // Récupérer le mode actuel depuis JavaVisualizerManager (mode par défaut = "concret")
-        String currentMode = "concret";
+        // Récupérer le mode actuel depuis JavaVisualizerManager (mode par défaut = "Concret")
+        String currentDisplayMode = "Concret";
+
         if (JavaVisualizerManager.getInstance() != null) {
-            currentMode = JavaVisualizerManager.getInstance().getAffichageMode();
+            currentDisplayMode = JavaVisualizerManager.getInstance().getAffichageMode();
         }
         // Pré-sélectionner le mode courant dans le combo box
-        affichageCombo.setSelectedItem(currentMode);
+        affichageCombo.setSelectedItem(currentDisplayMode);
+
+        // Pré-sélection du tri de la pile via PluginSettings
+        SortMode currentSortMode = PluginSettings.getSortMode(); // Par exemple, ALPHABETICAL par défaut
+        String sortStr;
+        switch (currentSortMode) {
+            case FIFO:
+                sortStr = "FIFO";
+                break;
+            case LIFO:
+                sortStr = "LIFO";
+                break;
+            default:
+                sortStr = "Alphabetique";
+                break;
+        }
+        pileCombo.setSelectedItem(sortStr);
     }
 
     @Override
@@ -35,12 +50,12 @@ public class SettingsDialog extends DialogWrapper {
         mainPanel = new JPanel(new GridLayout(0, 2, 8, 8));
 
         // Ligne : Type d'affichage
-        JLabel affichageLabel = new JLabel("Type d'affichage:");
+        JLabel affichageLabel = new JLabel("Type d'affichage des objets:");
         // Options disponibles : "abstrait" et "concret"
-        affichageCombo = new ComboBox<>(new String[]{"abstrait", "concret"});
+        affichageCombo = new ComboBox<>(new String[]{"Abstrait", "Concret"});
 
         JLabel pileLabel = new JLabel("Sens de la pile:");
-        pileCombo = new ComboBox<>(new String[]{"alphabetique", "LIFO", "FIFO"});
+        pileCombo = new ComboBox<>(new String[]{"Alphabetique", "LIFO", "FIFO"});
 
         // Ajout des composants dans le panneau
         mainPanel.add(affichageLabel);
@@ -54,5 +69,10 @@ public class SettingsDialog extends DialogWrapper {
     // Méthode pour récupérer l'option de type d'affichage sélectionnée
     public String getSelectedAffichage() {
         return (String) affichageCombo.getSelectedItem();
+    }
+
+    // Méthode pour récupérer l'option de tri de la pile sélectionnée
+    public String getSelectedPile() {
+        return (String) pileCombo.getSelectedItem();
     }
 }

@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
 
-class MainPane extends JPanel {
+public class MainPane extends JPanel {
     private JLabel placeholderLabel;
     private JLabel sortModeLabel;
     private VisualizationPanel viz;
