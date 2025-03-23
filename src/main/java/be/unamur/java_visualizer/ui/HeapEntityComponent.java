@@ -1,11 +1,10 @@
 package be.unamur.java_visualizer.ui;
 
 import be.unamur.java_visualizer.model.*;
+import be.unamur.java_visualizer.plugin.PluginSettings;
 
 import javax.swing.*;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Graphics;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -80,13 +79,20 @@ class HeapEntityComponent extends JPanel {
 					String typeName = (local.getValue().typeName != null)
 							? local.getValue().typeName
 							: "<?>";
-					JLabel typeLabel = new CustomJLabel(typeName, JLabel.LEFT);
+					if ("Simplifié".equals(PluginSettings.getTypeMode())) {
+						typeName = PluginSettings.simplifyTypeName(typeName);
+					}
+					JLabel typeLabel = new CustomJLabel(typeName, JLabel.CENTER);
+					typeLabel.setOpaque(true);
+					typeLabel.setBackground(StackFrameComponent.isPrimitive(local.getValue())
+							? new Color(0xFF, 0xEE, 0xCC)
+							: new Color(0xEE, 0xFF, 0xEE));
 					typeLabel.setFont(Constants.fontUI);
 					typeLabel.setForeground(Constants.colorText);
 
 
 					// -- 2) KEY --
-					JLabel keyLabel = new CustomJLabel(local.getKey(), JLabel.RIGHT);
+					JLabel keyLabel = new CustomJLabel(local.getKey(), JLabel.CENTER);
 					keyLabel.setFont(Constants.fontUI);
 					keyLabel.setForeground(Constants.colorText);
 
@@ -100,12 +106,10 @@ class HeapEntityComponent extends JPanel {
 				}
 				setComponents(typeComps, keyComps, valComps);
 
-				setColors(Constants.colorHeapKey, Constants.colorHeapVal, Constants.colorHeapVal, Constants.colorHeapBorder);
+				setColors(Constants.colorHeapVal, Constants.colorHeapVal, Constants.colorHeapVal, Constants.colorHeapBorder);
 				setPadding(Constants.padHeapMap);
 
-
 				build();
-
 			}
 
 		}
@@ -123,7 +127,7 @@ class HeapEntityComponent extends JPanel {
 				String typeName = (entry.val.typeName != null)
 						? entry.val.typeName
 						: "<?>";
-				JLabel typeLabel = new CustomJLabel(typeName, JLabel.LEFT);
+				JLabel typeLabel = new CustomJLabel(typeName, JLabel.CENTER);
 				typeLabel.setFont(Constants.fontUI);
 				typeLabel.setForeground(Constants.colorText);
 
@@ -140,7 +144,7 @@ class HeapEntityComponent extends JPanel {
 				valComps.add(valComp);
 			}
 
-			setColors(Constants.colorHeapKey, Constants.colorHeapVal, Constants.colorHeapVal, Constants.colorHeapBorder);
+			setColors(Constants.colorHeapVal, Constants.colorHeapVal, Constants.colorHeapVal, Constants.colorHeapBorder);
 			setPadding(Constants.padHeapMap);
 
 			setComponents(typeComps, keyComps, valComps);

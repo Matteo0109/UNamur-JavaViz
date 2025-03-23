@@ -11,8 +11,7 @@ class PanelPrimitive extends JPanel {
         setBackground(Constants.colorHeapVal);
         // Optionnel: setBorder(BorderFactory.createLineBorder(Constants.colorHeapBorder));
 
-        // Récupérer la valeur string et l'entourer de guillemets
-        String quotedVal = "\"" + e.value.stringValue + "\"";
+        String quotedVal = e.isString ? "\"" + e.value.stringValue + "\"" : e.value.stringValue;
 
         JLabel label = new CustomJLabel(quotedVal);
         label.setFont(Constants.fontUI);

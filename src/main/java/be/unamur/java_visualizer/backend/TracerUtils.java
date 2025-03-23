@@ -75,6 +75,7 @@ class TracerUtils {
 					fullName = "local class " + fullName.substring(1);
 			}
 		}
+
 		return fullName;
 	}
 }

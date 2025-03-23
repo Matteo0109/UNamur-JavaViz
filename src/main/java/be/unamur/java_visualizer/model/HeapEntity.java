@@ -42,6 +42,7 @@ public abstract class HeapEntity {
 		e.id = o.getLong("id");
 		e.type = type;
 		e.label = o.getString("label");
+
 		return e;
 	}
 }

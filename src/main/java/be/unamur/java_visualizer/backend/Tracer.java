@@ -9,6 +9,7 @@ import be.unamur.java_visualizer.model.HeapObject;
 import be.unamur.java_visualizer.model.HeapPrimitive;
 import be.unamur.java_visualizer.model.Value;
 import be.unamur.java_visualizer.plugin.MainPane;
+import be.unamur.java_visualizer.plugin.PluginSettings;
 import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.ArrayReference;
 import com.sun.jdi.BooleanValue;
@@ -238,20 +239,23 @@ public class Tracer {
 		boolean isAbstract = panel.getVisualizationPanel().isAbstractView();
 
 		if (isAbstract) {
-
-
 			// On renvoie un HeapPrimitive (comme si c'était un String) pour que l'affichage soit identique
 			// à un "vrai" String.
 			HeapPrimitive asString = new HeapPrimitive();
 			asString.type = HeapEntity.Type.PRIMITIVE;
-			asString.label = displayNameForType(obj);
+			if ("Simplifié".equals(PluginSettings.getTypeMode())) {
+				asString.label = PluginSettings.simplifyTypeName(displayNameForType(obj));
+			}
+			else {
+				asString.label = displayNameForType(obj);
+			}
 			asString.id = obj.uniqueID();
-
 			// On stocke la vraie valeur toString() dans asString.value
 			Value val = new Value();
 			val.type = Value.Type.STRING;
 			val.stringValue = getRealToString(obj, thread);
 			asString.value = val;
+			asString.isString = "String".equals(asString.label) || "java.lang.String".equals(asString.label);
 
 			return asString;
 		} else {
@@ -292,7 +296,13 @@ public class Tracer {
 					&& isInternalPackage(typeName)) {
 				HeapList out = new HeapList();
 				out.type = HeapEntity.Type.LIST; // XXX: or SET
-				out.label = displayNameForType(obj);
+				if ("Simplifié".equals(PluginSettings.getTypeMode())) {
+					out.label = PluginSettings.simplifyTypeName(displayNameForType(obj));
+				}
+				else {
+					out.label = displayNameForType(obj);
+				}
+
 				Iterator<com.sun.jdi.Value> i = getIterator(thread, obj);
 				while (i.hasNext()) {
 					out.items.add(convertValue(i.next()));
@@ -303,7 +313,12 @@ public class Tracer {
 			if (doesImplementInterface(obj, "java.util.Map") && isInternalPackage(typeName)) {
 				HeapMap out = new HeapMap();
 				out.type = HeapEntity.Type.MAP;
-				out.label = displayNameForType(obj);
+				if ("Simplifié".equals(PluginSettings.getTypeMode())) {
+					out.label = PluginSettings.simplifyTypeName(displayNameForType(obj));
+				}
+				else {
+					out.label = displayNameForType(obj);
+				}
 
 				ObjectReference entrySet = (ObjectReference) invokeSimple(thread, obj, "entrySet");
 				Iterator<com.sun.jdi.Value> i = getIterator(thread, entrySet);
@@ -320,7 +335,12 @@ public class Tracer {
 			// now, arbitrary objects
 			HeapObject out = new HeapObject();
 			out.type = HeapEntity.Type.OBJECT;
-			out.label = displayNameForType(obj);
+			if ("Simplifié".equals(PluginSettings.getTypeMode())) {
+				out.label = PluginSettings.simplifyTypeName(displayNameForType(obj));
+			}
+			else {
+				out.label = displayNameForType(obj);
+			}
 
 			ReferenceType refType = obj.referenceType();
 

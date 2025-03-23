@@ -18,6 +18,7 @@ public class ShowSettingsAction extends AnAction {
         if (dialog.showAndGet()) { // Si l'utilisateur valide le dialogue
             String affichage = dialog.getSelectedAffichage();
             String sensPile = dialog.getSelectedPile();
+            String typeMode = dialog.getSelectedTypeMode();
 
             // Récupération de l'instance du manager
             JavaVisualizerManager manager = JavaVisualizerManager.getInstance();
@@ -39,6 +40,9 @@ public class ShowSettingsAction extends AnAction {
                         break;
                 }
                 PluginSettings.setSortMode(selectedMode);
+
+                // Mise à jour du mode de type
+                PluginSettings.setTypeMode(typeMode);
 
                 // Force le rafraîchissement de la visualisation pour appliquer le changement
                 manager.forceRefreshVisualizer();

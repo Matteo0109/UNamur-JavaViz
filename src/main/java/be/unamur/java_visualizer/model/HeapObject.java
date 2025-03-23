@@ -34,6 +34,7 @@ public class HeapObject extends HeapEntity {
 		JSONArray vals = o.getJSONArray("vals");
 		for (int i = 0; i < keys.length(); i++) {
 			e.fields.put(keys.getString(i), Value.fromJson(vals.getJSONArray(i)));
+
 		}
 		return e;
 	}
@@ -53,7 +54,7 @@ public class HeapObject extends HeapEntity {
 		if (abstractSummary != null) {
 			return abstractSummary;
 		}
-		// Sinon, renvoyer par défaut le label (ou un autre fallback)
+		// Sinon, renvoyer par défaut le label
 		return label;
 	}
 }

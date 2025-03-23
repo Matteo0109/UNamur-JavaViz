@@ -12,23 +12,25 @@ public class SettingsDialog extends DialogWrapper {
     private JPanel mainPanel;
     private JComboBox<String> affichageCombo;
     private JComboBox<String> pileCombo;
+    private JComboBox<String> typeModeCombo;
 
     public SettingsDialog() {
         super(true); // true pour activer les boutons OK et Annuler
         init();
         setTitle("Paramètres d'affichage");
 
-        // Récupérer le mode actuel depuis JavaVisualizerManager (mode par défaut = "Concret")
+        // Récupérer le mode actuel depuis JavaVisualizerManager
         String currentDisplayMode = "Concret";
 
         if (JavaVisualizerManager.getInstance() != null) {
             currentDisplayMode = JavaVisualizerManager.getInstance().getAffichageMode();
         }
+
         // Pré-sélectionner le mode courant dans le combo box
         affichageCombo.setSelectedItem(currentDisplayMode);
 
         // Pré-sélection du tri de la pile via PluginSettings
-        SortMode currentSortMode = PluginSettings.getSortMode(); // Par exemple, ALPHABETICAL par défaut
+        SortMode currentSortMode = PluginSettings.getSortMode();
         String sortStr;
         switch (currentSortMode) {
             case FIFO:
@@ -42,6 +44,10 @@ public class SettingsDialog extends DialogWrapper {
                 break;
         }
         pileCombo.setSelectedItem(sortStr);
+
+        String currentTypeMode = PluginSettings.getTypeMode();
+        typeModeCombo.setSelectedItem(currentTypeMode);
+
     }
 
     @Override
@@ -57,11 +63,16 @@ public class SettingsDialog extends DialogWrapper {
         JLabel pileLabel = new JLabel("Sens de la pile:");
         pileCombo = new ComboBox<>(new String[]{"Alphabetique", "LIFO", "FIFO"});
 
+        JLabel typeModeLabel = new JLabel("Mode de type:");
+        typeModeCombo =  new ComboBox<>(new String[]{"Précis", "Simplifié"});
+
         // Ajout des composants dans le panneau
         mainPanel.add(affichageLabel);
         mainPanel.add(affichageCombo);
         mainPanel.add(pileLabel);
         mainPanel.add(pileCombo);
+        mainPanel.add(typeModeLabel);
+        mainPanel.add(typeModeCombo);
 
         return mainPanel;
     }
@@ -75,4 +86,10 @@ public class SettingsDialog extends DialogWrapper {
     public String getSelectedPile() {
         return (String) pileCombo.getSelectedItem();
     }
+
+    // Méthode pour récupérer l'option de mode de type sélectionnée
+    public String getSelectedTypeMode() {
+        return (String) typeModeCombo.getSelectedItem();
+    }
+
 }

@@ -103,12 +103,12 @@ public class VisualizationPanel extends JPanel {
 
 		// Type abstrait ou type concret
 		String labelText = abstractView ? "Affichage Type Abstrait" : "Affichage Type Concret";
-		JLabel modeLabel = new CustomJLabel(abstractView ? "Affichage Abstrait" : "Affichage Concret", JLabel.LEFT);
+		JLabel modeLabel = new CustomJLabel(abstractView ? "Affichage Abstrait" : "Affichage Concret", JLabel.CENTER);
 		modeLabel.setFont(Constants.fontUI);
 		add(modeLabel);
 
-		JLabel labelStack = new CustomJLabel("Stack", JLabel.RIGHT);
-		JLabel labelHeap = new CustomJLabel("Heap", JLabel.LEFT);
+		JLabel labelStack = new CustomJLabel("Stack", JLabel.CENTER);
+		JLabel labelHeap = new CustomJLabel("Heap", JLabel.CENTER);
 		labelStack.setForeground(Constants.colorText);
 		labelHeap.setForeground(Constants.colorText);
 		labelStack.setFont(fontTitle);

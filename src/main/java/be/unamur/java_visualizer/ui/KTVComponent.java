@@ -85,15 +85,16 @@ class KTVComponent extends JPanel {
 			y += padding;
 			// Positionner la colonne Type
 			int xType = padding;
-			typeComp.setBounds(xType + (typeWidth - typeSize.width), y, typeSize.width, h);
+			//typeComp.setBounds(xType + (typeWidth - typeSize.width), y, typeSize.width, h);
+			typeComp.setBounds(xType, y, typeWidth, h);
 
 			// Positionner la colonne Nom (Key)
 			int xKey = xType + typeWidth + padding;
-			keyComp.setBounds(xKey + (keyWidth - keySize.width), y, keySize.width, h);
+			keyComp.setBounds(xKey + (keyWidth - keySize.width) / 2, y, keySize.width, h);
 
 			// Positionner la colonne Valeur (Value)
-			int xVal = xKey + keyWidth + padding;
-			valComp.setBounds(xVal, y, valSize.width, h);
+			int xVal = xKey + keyWidth + padding + 3;
+			valComp.setBounds(xVal + ((valueWidth - valSize.width) / 2), y, valSize.width, h);
 
 			y += h + padding;
 			vsplits[i] = y;

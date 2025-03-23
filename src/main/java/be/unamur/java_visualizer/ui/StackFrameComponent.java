@@ -26,11 +26,11 @@ public class StackFrameComponent extends JPanel {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		setBorder(new MatteBorder(0, 1, 0, 0, Constants.colorFrameOutline));
 
-		JLabel labelName = new CustomJLabel(frame.name, JLabel.LEFT);
+		JLabel labelName = new CustomJLabel(frame.name, JLabel.CENTER);
 		labelName.setFont(Constants.fontUIMono);
 		labelName.setForeground(Constants.colorText);
 		labelName.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-		labelName.setAlignmentX(RIGHT_ALIGNMENT);
+		labelName.setAlignmentX(CENTER_ALIGNMENT);
 		labelName.setMaximumSize(Constants.maxDimension);
 		add(labelName);
 
@@ -52,7 +52,7 @@ public class StackFrameComponent extends JPanel {
 				Collections.reverse(localEntries);
 				break;
 			case FIFO:
-				// FIFO : on conserve l'ordre d'insertion (frame.locals doit être un LinkedHashMap)
+				// FIFO : on conserve l'ordre d'insertion
 				break;
 		}
 		// ---------------------
@@ -61,15 +61,36 @@ public class StackFrameComponent extends JPanel {
 		List<JComponent> key = new ArrayList<>();
 		List<JComponent> val = new ArrayList<>();
 
+		// -- Ajout de la première ligne (en-tête) --
+		JLabel headerType = new JLabel("Type", SwingConstants.CENTER);
+		headerType.setForeground(Color.BLACK);
+		headerType.setFont(Constants.fontUI.deriveFont(Font.BOLD));
+
+		JLabel headerKey = new JLabel("Variable", SwingConstants.CENTER);
+		headerKey.setForeground(Color.BLACK);
+		headerKey.setFont(Constants.fontUI.deriveFont(Font.BOLD));
+
+		JLabel headerVal = new JLabel("Valeur", SwingConstants.CENTER);
+		headerVal.setForeground(Color.BLACK);
+		headerVal.setFont(Constants.fontUI.deriveFont(Font.BOLD));
+
+		type.add(headerType);
+		key.add(headerKey);
+		val.add(headerVal);
+
 		// Parcours de la liste potentiellement réordonnée
 		for (Map.Entry<String, Value> local : localEntries) {
 			// TYPE
-			String typeName = (local.getValue().typeName != null)
-					? local.getValue().typeName
-					: "<?>";
-			JLabel typeLabel = new CustomJLabel(typeName, JLabel.LEFT);
+			String typeMode = PluginSettings.getTypeMode(); // "précis" ou "simplifié"
+			String typeName = (local.getValue().typeName != null) ? local.getValue().typeName : "<?>";
+
+			if ("Simplifié".equals(typeMode)) {
+				// Simplification du nom du type
+				typeName = PluginSettings.simplifyTypeName(typeName);
+			}
+
+			JLabel typeLabel = new CustomJLabel(typeName, JLabel.CENTER);
 			typeLabel.setOpaque(true);
-			// Ne modifie rien ici (la logique de new Color reste inchangée)
 			typeLabel.setBackground(isPrimitive(local.getValue())
 					? new Color(0xFF, 0xEE, 0xCC)
 					: new Color(0xEE, 0xFF, 0xEE));
@@ -77,7 +98,7 @@ public class StackFrameComponent extends JPanel {
 			typeLabel.setForeground(Constants.colorText);
 
 			// NAME
-			JLabel localLabel = new CustomJLabel(local.getKey(), JLabel.RIGHT);
+			JLabel localLabel = new CustomJLabel(local.getKey(), JLabel.CENTER);
 			localLabel.setFont(Constants.fontUI);
 			localLabel.setForeground(Constants.colorText);
 
@@ -90,9 +111,9 @@ public class StackFrameComponent extends JPanel {
 		}
 
 		KTVComponent locals = new KTVComponent();
-		locals.setPadding(4);
+		locals.setPadding(7);
 		locals.setColors(
-				Constants.colorHeapKey,
+				Constants.colorHeapVal,
 				Constants.colorHeapVal,
 				Constants.colorHeapVal,
 				Constants.colorHeapBorder
@@ -108,15 +129,12 @@ public class StackFrameComponent extends JPanel {
 		return Constants.maxDimension;
 	}
 
-	private boolean isPrimitive(Value v) {
-		switch (v.type) {
-			case LONG:
-			case DOUBLE:
-			case BOOLEAN:
-			case CHAR:
-				return true;
-			default:
-				return false;
-		}
+	public static boolean isPrimitive(Value v) {
+        return switch (v.type) {
+            case LONG, DOUBLE, BOOLEAN, CHAR -> true;
+            default -> false;
+        };
 	}
+
+
 }

@@ -5,7 +5,7 @@ import java.awt.Dimension;
 
 class CustomJLabel extends JLabel {
 	CustomJLabel(String str) {
-		this(str, LEFT);
+		this(str, CENTER);
 	}
 
 	CustomJLabel(String str, int horizontalAlignment) {

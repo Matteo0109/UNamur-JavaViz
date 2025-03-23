@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 public class HeapPrimitive extends HeapEntity {
 	public Value value;
+	public boolean isString = true;
 
 	@Override
 	public boolean hasSameStructure(HeapEntity other) {
