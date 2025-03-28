@@ -28,6 +28,7 @@ class HeapPanel extends JPanel {
 
 		setOpaque(false);
 		setLayout(null);
+		setBorder(new RoundedBorder(8));
 
 		createComponents();
 		computeLayout();
@@ -85,6 +86,7 @@ class HeapPanel extends JPanel {
 			lastEntity = component;
 		}
 		setPreferredSize(new Dimension(bounds.width, bounds.height));
+
 	}
 
 	private void addValuesToLayout(List<ValueComponent> vals) {

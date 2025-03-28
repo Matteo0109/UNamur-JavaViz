@@ -20,11 +20,11 @@ class PanelPrimitive extends JPanel {
         // On place ce label dans le panneau
         Dimension size = label.getPreferredSize();
         label.setBounds(8, 8, size.width, size.height);
+        setBorder(new RoundedBorder(8));
+
         add(label);
 
         // Prévoir la taille globale
         setPreferredSize(new Dimension(size.width + 16, size.height + 16));
     }
 }
-
-

@@ -12,16 +12,18 @@ import java.io.InputStream;
 
 class Constants {
 	static final Color colorBackground = new Color(0xFF, 0xFF, 0xFF);
-	static final Color colorText = new Color(0x0, 0x0, 0x0);
+	static final Color colorText = new Color(0x21, 0x21, 0x21);
 
 	static final Color colorFrameBG = new Color(0xF7, 0xF7, 0xF7);
 	static final Color colorFrameBGFirst = new Color(0xE2, 0xEB, 0xF6);
 	static final Color colorFrameOutline = new Color(0xAA, 0xAA, 0xAA);
 
-	static final Color colorHeapKey = new Color(0xFA, 0xEB, 0xBF);
-	static final Color colorHeapVal = new Color(0xFF, 0xFF, 0xC6);
+	static final Color colorHeapKey = new Color(0xFF, 255, 255);
+	static final Color colorHeapVal = new Color(255, 0xFF, 0xFF);
 	static final Color colorHeapLabel = new Color(0x55, 0x55, 0x55);
-	static final Color colorHeapBorder = new Color(0x88, 0x88, 0x88);
+	static final Color colorHeapBorder = new Color(0xBD, 0xBD, 0xBD);
+	static final Color colorPrimitiveLabel = new Color(232, 249, 0xFF);
+	static final Color colorNonPrimitiveLabel = new Color(196, 217, 255);
 
 	static final Color colorPointer = new Color(0x00, 0x55, 0x83);
 	static final Color colorPointerInactive = new Color(0xCC, 0xCC, 0xCC);
@@ -39,10 +41,10 @@ class Constants {
 	static final int padHeapVertical = 16;
 	static final int padHeapHorizontal = 32;
 	static final int padHeapContinuation = 32;
-	static final int padHeapMap = 4;
+	static final int padHeapMap = 8;
 
 	static final int pointerSrcRadius = 3;
-	static final int pointerWidth = 16;
+	static final int pointerWidth = 10;
 
 	static final Dimension maxDimension = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
 

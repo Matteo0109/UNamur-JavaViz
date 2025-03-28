@@ -4,6 +4,7 @@ import be.unamur.java_visualizer.model.Frame;
 import be.unamur.java_visualizer.model.Value;
 import be.unamur.java_visualizer.plugin.PluginSettings;    // Pour récupérer le mode de tri
 import be.unamur.java_visualizer.plugin.SortMode;         // Pour l'enum des modes de tri
+import be.unamur.java_visualizer.ui.RoundedBorder;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
@@ -70,9 +71,10 @@ public class StackFrameComponent extends JPanel {
 		headerKey.setForeground(Color.BLACK);
 		headerKey.setFont(Constants.fontUI.deriveFont(Font.BOLD));
 
-		JLabel headerVal = new JLabel("Valeur", SwingConstants.CENTER);
+		JLabel headerVal = new JLabel("Valeur ", SwingConstants.CENTER);
 		headerVal.setForeground(Color.BLACK);
 		headerVal.setFont(Constants.fontUI.deriveFont(Font.BOLD));
+
 
 		type.add(headerType);
 		key.add(headerKey);
@@ -92,10 +94,11 @@ public class StackFrameComponent extends JPanel {
 			JLabel typeLabel = new CustomJLabel(typeName, JLabel.CENTER);
 			typeLabel.setOpaque(true);
 			typeLabel.setBackground(isPrimitive(local.getValue())
-					? new Color(0xFF, 0xEE, 0xCC)
-					: new Color(0xEE, 0xFF, 0xEE));
+					? Constants.colorPrimitiveLabel
+					: Constants.colorNonPrimitiveLabel);
 			typeLabel.setFont(Constants.fontUI);
 			typeLabel.setForeground(Constants.colorText);
+			typeLabel.setBorder(new RoundedBorder(8));
 
 			// NAME
 			JLabel localLabel = new CustomJLabel(local.getKey(), JLabel.CENTER);
@@ -112,14 +115,11 @@ public class StackFrameComponent extends JPanel {
 
 		KTVComponent locals = new KTVComponent();
 		locals.setPadding(7);
-		locals.setColors(
-				Constants.colorHeapVal,
-				Constants.colorHeapVal,
-				Constants.colorHeapVal,
-				Constants.colorHeapBorder
-		);
+		locals.setColors(Constants.colorHeapKey, Constants.colorHeapVal, Constants.colorHeapVal, Constants.colorHeapBorder);
 		locals.setComponents(type, key, val);
 		locals.build();
+		locals.setBorder(new RoundedBorder(8));
+
 
 		add(locals);
 	}

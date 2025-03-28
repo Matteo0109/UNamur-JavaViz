@@ -85,10 +85,11 @@ class HeapEntityComponent extends JPanel {
 					JLabel typeLabel = new CustomJLabel(typeName, JLabel.CENTER);
 					typeLabel.setOpaque(true);
 					typeLabel.setBackground(StackFrameComponent.isPrimitive(local.getValue())
-							? new Color(0xFF, 0xEE, 0xCC)
-							: new Color(0xEE, 0xFF, 0xEE));
+							? Constants.colorPrimitiveLabel
+							: Constants.colorNonPrimitiveLabel);
 					typeLabel.setFont(Constants.fontUI);
 					typeLabel.setForeground(Constants.colorText);
+					typeLabel.setBorder(new RoundedBorder(8));
 
 
 					// -- 2) KEY --
@@ -106,8 +107,9 @@ class HeapEntityComponent extends JPanel {
 				}
 				setComponents(typeComps, keyComps, valComps);
 
-				setColors(Constants.colorHeapVal, Constants.colorHeapVal, Constants.colorHeapVal, Constants.colorHeapBorder);
+				setColors(Constants.colorHeapKey, Constants.colorHeapVal, Constants.colorHeapVal, Constants.colorHeapBorder);
 				setPadding(Constants.padHeapMap);
+				setBorder(new RoundedBorder(8));
 
 				build();
 			}
@@ -144,8 +146,10 @@ class HeapEntityComponent extends JPanel {
 				valComps.add(valComp);
 			}
 
-			setColors(Constants.colorHeapVal, Constants.colorHeapVal, Constants.colorHeapVal, Constants.colorHeapBorder);
+			setColors(Constants.colorHeapKey, Constants.colorHeapVal, Constants.colorHeapVal, Constants.colorHeapBorder);
 			setPadding(Constants.padHeapMap);
+			setBorder(new RoundedBorder(8));
+
 
 			setComponents(typeComps, keyComps, valComps);
 
