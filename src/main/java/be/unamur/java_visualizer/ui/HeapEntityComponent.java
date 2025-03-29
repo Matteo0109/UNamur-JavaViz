@@ -164,6 +164,7 @@ class HeapEntityComponent extends JPanel {
 			setBackground(Constants.colorHeapVal);
 			setLayout(null);
 			splits = new int[e.items.size()];
+			setBorder(new RoundedBorder(8));
 
 			int height = 0;
 			int x = 0;
@@ -193,7 +194,7 @@ class HeapEntityComponent extends JPanel {
 			super.paintComponent(g);
 
 			g.setColor(Constants.colorHeapBorder);
-			g.drawLine(1, getHeight() - 1, getWidth(), getHeight() - 1);
+			//g.drawLine(1, getHeight() - 1, getWidth(), getHeight() - 1);
 			for (int s : splits) {
 				g.drawLine(s + 1, 0, s + 1, getHeight() - 1);
 			}

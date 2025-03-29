@@ -16,19 +16,20 @@ import java.util.Set;
 class HeapPanel extends JPanel {
 	private VisualizationPanel viz;
 	private Map<Long, HeapEntity> heap;
+	private final boolean isAbstractView;
 
 	private Map<Long, HeapEntityComponent> components = new HashMap<>();
 
 	private Set<Long> layoutCompleted = new HashSet<>();
 	private LinkedList<ValueComponent> layoutPending = new LinkedList<>();
 
-	HeapPanel(VisualizationPanel viz, Map<Long, HeapEntity> heap) {
+	HeapPanel(VisualizationPanel viz, Map<Long, HeapEntity> heap, boolean isAbstractView) {
 		this.viz = viz;
 		this.heap = heap;
+		this.isAbstractView = isAbstractView;
 
 		setOpaque(false);
 		setLayout(null);
-		setBorder(new RoundedBorder(8));
 
 		createComponents();
 		computeLayout();
@@ -48,6 +49,9 @@ class HeapPanel extends JPanel {
 	}
 
 	private void computeLayout() {
+		layoutPending.clear();
+		layoutCompleted.clear();
+
 		layoutPending.addAll(viz.getReferenceComponents());
 
 		Rectangle bounds = new Rectangle();
@@ -68,6 +72,11 @@ class HeapPanel extends JPanel {
 
 			Dimension size = component.getPreferredSize();
 			boolean sameRow = lastEntity == null || lastEntity.getEntity().hasSameStructure(component.getEntity());
+
+			if (this.isAbstractView) {
+				sameRow = false; // Toujours nouvelle ligne en mode abstrait
+			}
+
 			if (!sameRow) {
 				y += rowHeight + Constants.padHeapVertical;
 				x = 0;
@@ -85,7 +94,7 @@ class HeapPanel extends JPanel {
 
 			lastEntity = component;
 		}
-		setPreferredSize(new Dimension(bounds.width, bounds.height));
+		setPreferredSize(new Dimension(bounds.width + Constants.padHeapHorizontal, bounds.height));
 
 	}
 

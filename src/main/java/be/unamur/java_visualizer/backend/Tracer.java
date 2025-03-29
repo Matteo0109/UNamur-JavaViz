@@ -9,6 +9,7 @@ import be.unamur.java_visualizer.model.HeapObject;
 import be.unamur.java_visualizer.model.HeapPrimitive;
 import be.unamur.java_visualizer.model.Value;
 import be.unamur.java_visualizer.plugin.MainPane;
+import be.unamur.java_visualizer.ui.VisualizationPanel;
 import be.unamur.java_visualizer.plugin.PluginSettings;
 import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.ArrayReference;
@@ -236,7 +237,23 @@ public class Tracer {
 	}
 
 	private HeapEntity convertObject(ObjectReference obj) {
-		boolean isAbstract = panel.getVisualizationPanel().isAbstractView();
+		boolean isAbstract;
+		// Récupère le VisualizationPanel depuis le MainPane
+		VisualizationPanel vizPanel = (panel != null) ? panel.getVisualizationPanel() : null;
+		if (vizPanel != null) {
+			// Si le panel UI existe, demande lui le mode
+			isAbstract = vizPanel.isAbstractView();
+		} else {
+			// Si le panel UI n'existe PAS ENCORE (premier lancement avant affichage),
+			// utilise une valeur par défaut. Le mode "Concret" (false) est souvent un bon défaut.
+			// Ou tu peux essayer de récupérer le mode depuis PluginSettings/JavaVisualizerManager si c'est plus fiable.
+			// Option 1: Défaut simple
+			isAbstract = false; // Par défaut : mode concret si l'UI n'est pas prête
+			// Option 2 (plus complexe, dépend si getInstance peut être null):
+			// JavaVisualizerManager manager = JavaVisualizerManager.getInstance();
+			// isAbstract = (manager != null && "Abstrait".equals(manager.getAffichageMode()));
+			System.out.println("Tracer.convertObject: VisualizationPanel not ready, defaulting to concrete view."); // Log pour info
+		}
 
 		if (isAbstract) {
 			// On renvoie un HeapPrimitive (comme si c'était un String) pour que l'affichage soit identique

@@ -12,7 +12,6 @@ import java.awt.BorderLayout;
 
 public class MainPane extends JPanel {
     private JLabel placeholderLabel;
-    private JLabel sortModeLabel;
     private VisualizationPanel viz;
     private ExecutionTrace currentTrace;
 
@@ -24,10 +23,6 @@ public class MainPane extends JPanel {
     MainPane() {
         setLayout(new BorderLayout());
 
-        // Label pour informer l'utilisateur du mode de tri
-        sortModeLabel = new JLabel("Tri actuel : " + PluginSettings.getSortMode());
-        add(sortModeLabel, BorderLayout.NORTH);
-
         String text = "No execution trace loaded: make sure you've stopped on a breakpoint.";
         placeholderLabel = new JLabel(text, SwingConstants.CENTER);
         add(placeholderLabel, BorderLayout.CENTER);
@@ -36,9 +31,6 @@ public class MainPane extends JPanel {
     void setTrace(ExecutionTrace trace) {
         //Mémorisation de la trace actuelle
         this.currentTrace = trace;
-
-        // Met à jour le label du mode de tri (ex. ALPHABETICAL / FIFO / LIFO)
-        sortModeLabel.setText("Tri actuel : " + PluginSettings.getSortMode());
 
         if (viz == null) {
             remove(placeholderLabel);

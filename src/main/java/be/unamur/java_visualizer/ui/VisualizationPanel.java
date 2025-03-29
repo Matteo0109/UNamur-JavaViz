@@ -2,13 +2,11 @@ package be.unamur.java_visualizer.ui;
 
 import be.unamur.java_visualizer.model.ExecutionTrace;
 import be.unamur.java_visualizer.model.Value;
-import be.unamur.java_visualizer.plugin.JavaVisualizerManager;
-import com.intellij.ui.JBColor;
+import be.unamur.java_visualizer.plugin.PluginSettings;
+import com.intellij.ui.JBColor; // Pour la couleur du frame courant
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -19,19 +17,14 @@ import static be.unamur.java_visualizer.ui.Constants.*;
 
 public class VisualizationPanel extends JPanel {
 	private ExecutionTrace trace = null;
-    private double scale = 1.0;
+	private double scale = 1.0;
 
 	private List<ValueComponent> referenceComponents;
 	private List<PointerConnection> pointerConnections;
 	private StackPanel stackPanel;
 	private HeapPanel heapPanel;
 	private PointerConnection selectedPointer;
-
-	// Attribut indiquant si l'affichage doit être abstrait (true) ou concret (false)
 	private boolean abstractView = false;
-
-	private static final int MARGIN = 10;
-	private static final int LINE_HEIGHT = 30;
 
 
 	public VisualizationPanel() {
@@ -43,9 +36,9 @@ public class VisualizationPanel extends JPanel {
 		addMouseMotionListener(new MouseAdapter() {
 			@Override
 			public void mouseMoved(MouseEvent e) {
-                int px = (int) (e.getX() / scale);
-                int py = (int) (e.getY() / scale);
-                PointerConnection sel = getSelectedPointer(px, py);
+				int px = (int) (e.getX() / scale);
+				int py = (int) (e.getY() / scale);
+				PointerConnection sel = getSelectedPointer(px, py);
 				if (sel != selectedPointer) {
 					if (selectedPointer != null) {
 						selectedPointer.setSelected(false);
@@ -58,27 +51,25 @@ public class VisualizationPanel extends JPanel {
 				}
 			}
 		});
-
-
-		// Construction initiale de l'interface
-		buildUI();
 	}
 
-    public void setTrace(ExecutionTrace t) {
-        this.trace = t;
-        refreshUI();
-    }
+	public void setTrace(ExecutionTrace t) {
+		this.trace = t;
+		refreshUI();
+	}
 
-    public void setScale(double scale) {
-        this.scale = scale;
-        if (this.trace != null) {
-            refreshUI();
-        }
-    }
+	public void setScale(double scale) {
+		this.scale = scale;
+		if (this.trace != null) {
+			refreshUI();
+		}
+	}
 
 	public void setAbstractView(boolean mode) {
 		this.abstractView = mode;
-		refreshUI();
+		if (this.trace != null) {
+			refreshUI();
+		}
 	}
 
 	public boolean isAbstractView() {
@@ -86,27 +77,68 @@ public class VisualizationPanel extends JPanel {
 	}
 
 	private void refreshUI() {
-        referenceComponents.clear();
-        removeAll();
-        buildUI();
-        revalidate();
-        repaint();
-    }
+		if (trace == null) {
+			removeAll();
+			buildUI(); // Afficher le message "Aucun trace..."
+			revalidate();
+			repaint();
+			return;
+		}
+		referenceComponents.clear();
+		pointerConnections.clear();
+		removeAll();
+		buildUI();
+		revalidate();
+		repaint();
+	}
 
 	private void buildUI() {
 		if (trace == null) {
-			JLabel noTraceLabel = new JLabel("Aucun trace à afficher pour l'instant");
-			noTraceLabel.setBounds(10, 10, 200, 30);
+			JLabel noTraceLabel = new CustomJLabel("Aucun trace à afficher pour l'instant. Lancez le débogueur et arrêtez-vous sur un point d'arrêt.", JLabel.CENTER);
+			noTraceLabel.setFont(Constants.fontUI);
+			Dimension prefSize = noTraceLabel.getPreferredSize();
+			noTraceLabel.setBounds(padOuter, padOuter, 600, prefSize.height);
 			add(noTraceLabel);
+			setPreferredSize(new Dimension(600 + 2 * padOuter, prefSize.height + 2 * padOuter));
 			return;
 		}
 
-		// Type abstrait ou type concret
-		String labelText = abstractView ? "Affichage Type Abstrait" : "Affichage Type Concret";
-		JLabel modeLabel = new CustomJLabel(abstractView ? "Affichage Abstrait" : "Affichage Concret", JLabel.CENTER);
-		modeLabel.setFont(Constants.fontUI);
-		add(modeLabel);
+		// Récupérer le nom du frame courant (le premier dans la liste = le plus haut dans la pile)
+		String currentFrameName = "N/A";
+		if (trace.frames != null && !trace.frames.isEmpty()) {
+			currentFrameName = trace.frames.get(0).name;
+		}
 
+		// Panel d'information en haut
+		JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 2));
+		infoPanel.setOpaque(false);
+
+		JLabel currentFrameLabel = new CustomJLabel("Current: " + currentFrameName + " ");
+		currentFrameLabel.setFont(Constants.fontUIMono.deriveFont(Font.BOLD));
+		currentFrameLabel.setForeground(JBColor.BLUE);
+		infoPanel.add(currentFrameLabel);
+
+		infoPanel.add(new CustomJLabel("|") {{ setFont(Constants.fontUISmall); }});
+
+		JLabel displayModeLabel = new CustomJLabel("Affichage : " + (abstractView ? "Abstrait" : "Concret"));
+		displayModeLabel.setFont(Constants.fontUISmall);
+		infoPanel.add(displayModeLabel);
+
+		infoPanel.add(new CustomJLabel("|") {{ setFont(Constants.fontUISmall); }});
+
+		JLabel sortModeLabel = new CustomJLabel("Tri Stack : " + PluginSettings.getSortMode().name());
+		sortModeLabel.setFont(Constants.fontUISmall);
+		infoPanel.add(sortModeLabel);
+
+		infoPanel.add(new CustomJLabel("|") {{ setFont(Constants.fontUISmall); }});
+
+		JLabel typeModeLabel = new CustomJLabel("Types : " + PluginSettings.getTypeMode());
+		typeModeLabel.setFont(Constants.fontUISmall);
+		infoPanel.add(typeModeLabel);
+
+		add(infoPanel);
+
+		// Création des composants principaux
 		JLabel labelStack = new CustomJLabel("Stack", JLabel.CENTER);
 		JLabel labelHeap = new CustomJLabel("Heap", JLabel.CENTER);
 		labelStack.setForeground(Constants.colorText);
@@ -114,67 +146,93 @@ public class VisualizationPanel extends JPanel {
 		labelStack.setFont(fontTitle);
 		labelHeap.setFont(fontTitle);
 		stackPanel = new StackPanel(this, trace.frames);
-		heapPanel = new HeapPanel(this, trace.heap);
+		heapPanel = new HeapPanel(this, trace.heap, this.abstractView);
 
 		add(labelStack);
 		add(labelHeap);
 		add(stackPanel);
 		add(heapPanel);
 
+		// Calculs de dimensions et positionnement
 		int labelHeight = Math.max(labelStack.getPreferredSize().height, labelHeap.getPreferredSize().height);
 		Dimension sizeStack = stackPanel.getPreferredSize();
 		Dimension sizeHeap = heapPanel.getPreferredSize();
-		int stackWidth = Math.max(labelStack.getPreferredSize().width, sizeStack.width);
-		int heapWidth = Math.max(labelHeap.getPreferredSize().width, sizeHeap.width);
-		labelStack.setBounds(padOuter, padOuter, stackWidth, labelHeight);
-		labelHeap.setBounds(padOuter + stackWidth + padCenter, padOuter, heapWidth, labelHeight);
-		stackPanel.setBounds(padOuter, padOuter + labelHeight + padTitle, stackWidth, sizeStack.height);
-		heapPanel.setBounds(padOuter + stackWidth + padCenter, padOuter + labelHeight + padTitle, heapWidth, sizeHeap.height);
+		int minPanelWidth = 200;
+		int stackWidth = Math.max(Math.max(labelStack.getPreferredSize().width, sizeStack.width), minPanelWidth);
+		int heapWidth = Math.max(Math.max(labelHeap.getPreferredSize().width, sizeHeap.width), minPanelWidth);
+
+		int infoPanelHeight = infoPanel.getPreferredSize().height;
+		int verticalGapAfterInfo = Constants.padOuter / 2;
+		int contentWidth = stackWidth + Constants.padCenter + heapWidth;
+		int infoPanelWidth = infoPanel.getPreferredSize().width;
+		infoPanel.setBounds(padOuter, padOuter, Math.min(infoPanelWidth, contentWidth), infoPanelHeight);
+
+		int titlesStartY = padOuter + infoPanelHeight + verticalGapAfterInfo;
+		labelStack.setBounds(padOuter, titlesStartY, stackWidth, labelHeight);
+		labelHeap.setBounds(padOuter + stackWidth + padCenter, titlesStartY, heapWidth, labelHeight);
+
+		int panelsStartY = titlesStartY + labelHeight + padTitle;
+		stackPanel.setBounds(padOuter, panelsStartY, stackWidth, sizeStack.height);
+		heapPanel.setBounds(padOuter + stackWidth + padCenter, panelsStartY, heapWidth, sizeHeap.height);
 
 		int outerWidth = (padOuter * 2) + stackWidth + padCenter + heapWidth;
-        int outerHeight = (padOuter * 2) + labelHeight + padTitle + Math.max(sizeStack.height, sizeHeap.height);
-        setPreferredSize(new Dimension((int) (outerWidth * scale), (int) (outerHeight * scale)));
+		int outerHeight = panelsStartY + Math.max(sizeStack.height, sizeHeap.height) + padOuter;
+		setPreferredSize(new Dimension((int) (outerWidth * scale), (int) (outerHeight * scale)));
 	}
 
 	private void computePointerPaths() {
-		if (heapPanel == null) {
+		if (heapPanel == null || stackPanel == null || referenceComponents == null || trace == null) {
 			return;
 		}
 		pointerConnections.clear();
 
 		for (ValueComponent ref : referenceComponents) {
+			if (!ref.isShowing() || ref.getParent() == null) continue;
+
 			Rectangle refBounds = getRelativeBounds(this, ref);
+			if (refBounds == null) continue;
+
 			long refId = ref.getValue().reference;
+			if (trace.heap == null || !trace.heap.containsKey(refId)) continue;
+
 			HeapEntityComponent obj = heapPanel.getHeapComponents().get(refId);
-			if (obj == null) {
-				continue; // shouldn't happen...
-			}
-			Rectangle objBounds = getRelativeBounds(this, obj);
-			if (refBounds == null || objBounds == null) {
+			if (obj == null || !obj.isShowing() || obj.getParent() == null) {
 				continue;
 			}
 
-			PointerConnection p = new PointerConnection(
-					ref.isActive(),
-					refBounds.x + refBounds.width - (pointerWidth / 2.0),
-					refBounds.y + (refBounds.height / 2.0),
-					objBounds.x,
-					objBounds.y + (objBounds.height / 2.0)
-			);
+			Rectangle objBounds = getRelativeBounds(this, obj);
+			if (objBounds == null) {
+				continue;
+			}
+
+			double startX = refBounds.x + refBounds.width - (pointerWidth / 2.0);
+			double startY = refBounds.y + (refBounds.height / 2.0);
+			double endX = objBounds.x;
+			double endY = objBounds.y + (objBounds.height / 2.0);
+
+			PointerConnection p = new PointerConnection( ref.isActive(), startX, startY, endX, endY );
 			pointerConnections.add(p);
 		}
 	}
 
 	@Override
 	protected void paintChildren(Graphics _g) {
-		Graphics2D g = (Graphics2D) _g;
-        g.scale(scale, scale);
+		Graphics2D g = (Graphics2D) _g.create();
+		try {
+			g.scale(scale, scale);
+			super.paintChildren(g);
 
-        super.paintChildren(g);
-
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		for (PointerConnection p : pointerConnections) {
-			p.paint(g);
+			if (pointerConnections != null && !pointerConnections.isEmpty()) {
+				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+				List<PointerConnection> connectionsToDraw = new ArrayList<>(pointerConnections);
+				for (PointerConnection p : connectionsToDraw) {
+					if (p != null) {
+						p.paint(g);
+					}
+				}
+			}
+		} finally {
+			g.dispose();
 		}
 	}
 
@@ -189,29 +247,41 @@ public class VisualizationPanel extends JPanel {
 	}
 
 	void registerValueComponent(ValueComponent component) {
-		if (component.getValue().type == Value.Type.REFERENCE) {
-			referenceComponents.add(component);
+		if (component != null && component.getValue().type == Value.Type.REFERENCE) {
+			if (!referenceComponents.contains(component)) {
+				referenceComponents.add(component);
+			}
 		}
 	}
 
 	private PointerConnection getSelectedPointer(int x, int y) {
-		if (pointerConnections == null) {
+		if (pointerConnections == null || pointerConnections.isEmpty()) {
 			return null;
 		}
 		PointerConnection selected = null;
-		Iterator<PointerConnection> i = pointerConnections.iterator();
-		while (i.hasNext()) {
-			PointerConnection p = i.next();
+		Iterator<PointerConnection> it = pointerConnections.iterator();
+		PointerConnection potentialSelection = null;
+		while (it.hasNext()) {
+			PointerConnection p = it.next();
 			if (p.isNear(x, y)) {
-				selected = p;
-				i.remove();
+				potentialSelection = p;
+				it.remove();
 				break;
 			}
 		}
-		if (selected != null) {
-			pointerConnections.add(selected);
+		if (potentialSelection != null) {
+			pointerConnections.add(potentialSelection);
+			selected = potentialSelection;
 		}
 		return selected;
 	}
 
+	private static Rectangle getRelativeBounds(Component parent, Component c) {
+		if (parent == null || c == null || !SwingUtilities.isDescendingFrom(c, parent)) {
+			return null;
+		}
+		Point compCoords = new Point(0, 0);
+		Point parentCoords = SwingUtilities.convertPoint(c, compCoords, parent);
+		return new Rectangle(parentCoords, c.getSize());
+	}
 }

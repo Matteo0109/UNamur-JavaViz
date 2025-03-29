@@ -74,27 +74,29 @@ class KTVComponent extends JPanel {
 			JComponent typeComp = types.get(i);
 			JComponent keyComp = keys.get(i);
 			JComponent valComp = vals.get(i);
-			Dimension typeSize = typeComp.getPreferredSize();
-			Dimension keySize = keyComp.getPreferredSize();
-			Dimension valSize = valComp.getPreferredSize();
-			int h = Math.max(Math.max(typeSize.height, keySize.height), valSize.height);
+
+			Dimension typePrefSize = typeComp.getPreferredSize();
+			Dimension keyPrefSize = keyComp.getPreferredSize();
+			Dimension valPrefSize = valComp.getPreferredSize();
+			int h = Math.max(Math.max(typePrefSize.height, keyPrefSize.height), valPrefSize.height);
 
 			add(typeComp);
 			add(keyComp);
 			add(valComp);
-			y += padding;
-			// Positionner la colonne Type
+
+			y += padding; // Espace avant la ligne
+
+			// Positionner la colonne Type : commence à padding, utilise toute la largeur 'typeWidth'
 			int xType = padding;
-			//typeComp.setBounds(xType + (typeWidth - typeSize.width), y, typeSize.width, h);
 			typeComp.setBounds(xType, y, typeWidth, h);
 
-			// Positionner la colonne Nom (Key)
+			// Positionner la colonne Nom (Key) : commence après Type+padding, utilise toute la largeur 'keyWidth'
 			int xKey = xType + typeWidth + padding;
-			keyComp.setBounds(xKey + (keyWidth - keySize.width) / 2, y, keySize.width, h);
+			keyComp.setBounds(xKey, y, keyWidth, h);
 
-			// Positionner la colonne Valeur (Value)
-			int xVal = xKey + keyWidth + padding + 3;
-			valComp.setBounds(xVal + ((valueWidth - valSize.width) / 2), y, valSize.width, h);
+			// Positionner la colonne Valeur (Value) : commence après Key+padding, utilise toute la largeur 'valueWidth'
+			int xVal = xKey + keyWidth + padding;
+			valComp.setBounds(xVal, y, valueWidth, h);
 
 			y += h + padding;
 			vsplits[i] = y;
@@ -130,8 +132,11 @@ class KTVComponent extends JPanel {
 			g.drawLine(hsplit1, 0, hsplit1, getHeight());
 			g.drawLine(hsplit2, 0, hsplit2, getHeight());
 			// Optionally, draw horizontal divider lines
-			for (int s : vsplits) {
-				g.drawLine(0, s - 1, getWidth(), s - 1);
+			if (vsplits != null && vsplits.length > 0) {
+				for (int i = 0; i < vsplits.length - 1; i++) {
+					int s = vsplits[i];
+					g.drawLine(0, s - 1, getWidth(), s - 1);
+				}
 			}
 		}
 	}

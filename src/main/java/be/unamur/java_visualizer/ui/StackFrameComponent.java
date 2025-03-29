@@ -18,22 +18,16 @@ import java.util.Map;
 public class StackFrameComponent extends JPanel {
 	private Frame frame;
 	private VisualizationPanel viz;
+	private String frameName;
 
 	public StackFrameComponent(VisualizationPanel viz, Frame frame, boolean first) {
 		this.frame = frame;
 		this.viz = viz;
+		this.frameName = frame.name;
 
-		setBackground(first ? Constants.colorFrameBGFirst : Constants.colorFrameBG);
+		//setBackground(first ? Constants.colorFrameBGFirst : Constants.colorFrameBG);
+		setOpaque(false);
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		setBorder(new MatteBorder(0, 1, 0, 0, Constants.colorFrameOutline));
-
-		JLabel labelName = new CustomJLabel(frame.name, JLabel.CENTER);
-		labelName.setFont(Constants.fontUIMono);
-		labelName.setForeground(Constants.colorText);
-		labelName.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-		labelName.setAlignmentX(CENTER_ALIGNMENT);
-		labelName.setMaximumSize(Constants.maxDimension);
-		add(labelName);
 
 		// ---------------------
 		// AJOUT DU TRI DES VARIABLES
@@ -71,7 +65,7 @@ public class StackFrameComponent extends JPanel {
 		headerKey.setForeground(Color.BLACK);
 		headerKey.setFont(Constants.fontUI.deriveFont(Font.BOLD));
 
-		JLabel headerVal = new JLabel("Valeur ", SwingConstants.CENTER);
+		JLabel headerVal = new JLabel(" Valeur  ", SwingConstants.CENTER);
 		headerVal.setForeground(Color.BLACK);
 		headerVal.setFont(Constants.fontUI.deriveFont(Font.BOLD));
 
@@ -115,6 +109,8 @@ public class StackFrameComponent extends JPanel {
 
 		KTVComponent locals = new KTVComponent();
 		locals.setPadding(7);
+		locals.setBackground(first ? Constants.colorFrameBGFirst : Constants.colorFrameBG);
+		locals.setOpaque(true);
 		locals.setColors(Constants.colorHeapKey, Constants.colorHeapVal, Constants.colorHeapVal, Constants.colorHeapBorder);
 		locals.setComponents(type, key, val);
 		locals.build();
@@ -122,6 +118,10 @@ public class StackFrameComponent extends JPanel {
 
 
 		add(locals);
+	}
+
+	public String getFrameName() {
+		return frameName;
 	}
 
 	@Override
