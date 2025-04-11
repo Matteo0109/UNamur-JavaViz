@@ -159,9 +159,11 @@ public class Tracer {
 					if (v instanceof ArrayReference && ((ArrayReference) v).length() == 0)
 						continue;
 				}
-
 				try {
-					output.locals.put(lv.name(), convertValue(sf.getValue(lv)));
+					Value val = convertValue(sf.getValue(lv));
+					val.declarationType = lv.typeName();
+					System.out.println("lv.name() = " + lv.name() + " lv.typeName() = " + lv.typeName());
+					output.locals.put(lv.name(), val);
 				} catch (IllegalArgumentException exc) {
 					System.out.println("That shouldn't happen!");
 				}
@@ -169,6 +171,7 @@ public class Tracer {
 		} catch (AbsentInformationException e) {
 			// ok.
 		}
+
 
 		// args did not have names, like a functional interface call...
 		// although hopefully a future Java version will give them names!
@@ -186,10 +189,10 @@ public class Tracer {
 
 		// now non-args
 		try {
-            /* We're using the fact that the hashCode tells us something
-               about the variable's position (which is subject to change)
-               to compensate for that the natural order of variables()
-               is often different from the declaration order (see LinkedList.java) */
+			/* We're using the fact that the hashCode tells us something
+		   about the variable's position (which is subject to change)
+		   to compensate for that the natural order of variables()
+		   is often different from the declaration order (see LinkedList.java) */
 			frame_vars = sf.location().method().variables();
 			TreeMap<Integer, LocalVariable> orderByHash = null;
 			int offset = 0;
@@ -206,7 +209,10 @@ public class Tracer {
 				for (Map.Entry<Integer, LocalVariable> me : orderByHash.entrySet()) {
 					try {
 						LocalVariable lv = me.getValue();
-						output.locals.put(lv.name(), convertValue(sf.getValue(lv)));
+						Value val = convertValue(sf.getValue(lv));
+						val.declarationType = lv.typeName();
+						System.out.println("lv.name() = " + lv.name() + " lv.typeName() = " + lv.typeName());
+						output.locals.put(lv.name(), val);
 					} catch (IllegalArgumentException exc) {
 						// variable not yet defined, don't list it
 					}
@@ -215,6 +221,7 @@ public class Tracer {
 		} catch (AbsentInformationException ex) {
 			// ok.
 		}
+
 
 		return output;
 	}
@@ -244,15 +251,8 @@ public class Tracer {
 			// Si le panel UI existe, demande lui le mode
 			isAbstract = vizPanel.isAbstractView();
 		} else {
-			// Si le panel UI n'existe PAS ENCORE (premier lancement avant affichage),
-			// utilise une valeur par défaut. Le mode "Concret" (false) est souvent un bon défaut.
-			// Ou tu peux essayer de récupérer le mode depuis PluginSettings/JavaVisualizerManager si c'est plus fiable.
-			// Option 1: Défaut simple
 			isAbstract = false; // Par défaut : mode concret si l'UI n'est pas prête
-			// Option 2 (plus complexe, dépend si getInstance peut être null):
-			// JavaVisualizerManager manager = JavaVisualizerManager.getInstance();
-			// isAbstract = (manager != null && "Abstrait".equals(manager.getAffichageMode()));
-			System.out.println("Tracer.convertObject: VisualizationPanel not ready, defaulting to concrete view."); // Log pour info
+			//System.out.println("Tracer.convertObject: VisualizationPanel not ready, defaulting to concrete view."); // Log pour info
 		}
 
 		if (isAbstract) {
@@ -308,6 +308,11 @@ public class Tracer {
 			}
 
 			String typeName = obj.referenceType().name();
+			System.out.println("convertObject314: " + typeName);
+			System.out.println("convertObject314 obj : " + obj);
+
+			System.out.println("convertObject314 obj ref: " + obj.referenceType());
+
 			if ((doesImplementInterface(obj, "java.util.List")
 					|| doesImplementInterface(obj, "java.util.Set"))
 					&& isInternalPackage(typeName)) {
@@ -383,6 +388,7 @@ public class Tracer {
 
 	private Value convertValue(com.sun.jdi.Value v) {
 		Value out = new Value();
+		System.out.println("convertValue: " + v);
 		if (v instanceof BooleanValue) {
 			out.type = Value.Type.BOOLEAN;
 			out.booleanValue = ((BooleanValue) v).value();
@@ -426,6 +432,8 @@ public class Tracer {
 			// on le traite comme un objet
 			out = convertReference((ObjectReference) v);
 			out.typeName = ((ObjectReference) v).referenceType().name();
+			System.out.println("434: " + out.typeName);
+
 		} else {
 			out.type = Value.Type.NULL;
 		}

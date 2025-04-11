@@ -113,7 +113,7 @@ public class VisualizationPanel extends JPanel {
 		JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 2));
 		infoPanel.setOpaque(false);
 
-		JLabel currentFrameLabel = new CustomJLabel("Current: " + currentFrameName + " ");
+		JLabel currentFrameLabel = new CustomJLabel("Actuellement: " + currentFrameName + " ");
 		currentFrameLabel.setFont(Constants.fontUIMono.deriveFont(Font.BOLD));
 		currentFrameLabel.setForeground(JBColor.BLUE);
 		infoPanel.add(currentFrameLabel);
@@ -126,13 +126,13 @@ public class VisualizationPanel extends JPanel {
 
 		infoPanel.add(new CustomJLabel("|") {{ setFont(Constants.fontUISmall); }});
 
-		JLabel sortModeLabel = new CustomJLabel("Tri Stack : " + PluginSettings.getSortMode().name());
+		JLabel sortModeLabel = new CustomJLabel("Tri Stack : " + PluginSettings.getSortMode().toDisplayString());
 		sortModeLabel.setFont(Constants.fontUISmall);
 		infoPanel.add(sortModeLabel);
 
 		infoPanel.add(new CustomJLabel("|") {{ setFont(Constants.fontUISmall); }});
 
-		JLabel typeModeLabel = new CustomJLabel("Types : " + PluginSettings.getTypeMode());
+		JLabel typeModeLabel = new CustomJLabel("Extension : " + PluginSettings.getTypeMode());
 		typeModeLabel.setFont(Constants.fontUISmall);
 		infoPanel.add(typeModeLabel);
 

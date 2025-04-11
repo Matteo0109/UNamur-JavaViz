@@ -8,7 +8,7 @@ public class PluginSettings {
 
 
     public static SortMode getSortMode() {
-        String modeStr = PropertiesComponent.getInstance().getValue(SORT_MODE_KEY, "FIFO");
+        String modeStr = PropertiesComponent.getInstance().getValue(SORT_MODE_KEY, "TOPDOWN");
         return SortMode.valueOf(modeStr);
     }
 

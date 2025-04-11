@@ -12,6 +12,7 @@ public class Value {
 	public char charValue;
 	public long reference;
 	public String typeName;
+	public String declarationType;
 
 	@Override
 	public String toString() {

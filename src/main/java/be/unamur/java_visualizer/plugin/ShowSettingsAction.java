@@ -29,14 +29,11 @@ public class ShowSettingsAction extends AnAction {
                 // Mise à jour du sens de la pile en fonction de la sélection
                 SortMode selectedMode;
                 switch (sensPile) {
-                    case "FIFO":
-                        selectedMode = SortMode.FIFO;
-                        break;
-                    case "LIFO":
-                        selectedMode = SortMode.LIFO;
+                    case "TOPDOWN":
+                        selectedMode = SortMode.TOPDOWN;
                         break;
                     default:
-                        selectedMode = SortMode.ALPHABETICAL;
+                        selectedMode = SortMode.BOTTOMUP;
                         break;
                 }
                 PluginSettings.setSortMode(selectedMode);

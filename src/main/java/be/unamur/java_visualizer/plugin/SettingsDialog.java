@@ -31,19 +31,9 @@ public class SettingsDialog extends DialogWrapper {
 
         // Pré-sélection du tri de la pile via PluginSettings
         SortMode currentSortMode = PluginSettings.getSortMode();
-        String sortStr;
-        switch (currentSortMode) {
-            case FIFO:
-                sortStr = "FIFO";
-                break;
-            case LIFO:
-                sortStr = "LIFO";
-                break;
-            default:
-                sortStr = "Alphabetique";
-                break;
+        if(currentSortMode != null) {
+            pileCombo.setSelectedItem(currentSortMode.toDisplayString());
         }
-        pileCombo.setSelectedItem(sortStr);
 
         String currentTypeMode = PluginSettings.getTypeMode();
         typeModeCombo.setSelectedItem(currentTypeMode);
@@ -61,9 +51,12 @@ public class SettingsDialog extends DialogWrapper {
         affichageCombo = new ComboBox<>(new String[]{"Abstrait", "Concret"});
 
         JLabel pileLabel = new JLabel("Sens de la pile:");
-        pileCombo = new ComboBox<>(new String[]{"Alphabetique", "LIFO", "FIFO"});
+        pileCombo = new ComboBox<>(new String[]{
+                SortMode.TOPDOWN.toDisplayString(),
+                SortMode.BOTTOMUP.toDisplayString()
+        });
 
-        JLabel typeModeLabel = new JLabel("Mode de type:");
+        JLabel typeModeLabel = new JLabel("Extension:");
         typeModeCombo =  new ComboBox<>(new String[]{"Précis", "Simplifié"});
 
         // Ajout des composants dans le panneau

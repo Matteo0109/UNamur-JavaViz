@@ -4,14 +4,11 @@ import be.unamur.java_visualizer.model.Frame;
 import be.unamur.java_visualizer.model.Value;
 import be.unamur.java_visualizer.plugin.PluginSettings;    // Pour récupérer le mode de tri
 import be.unamur.java_visualizer.plugin.SortMode;         // Pour l'enum des modes de tri
-import be.unamur.java_visualizer.ui.RoundedBorder;
 
 import javax.swing.*;
-import javax.swing.border.MatteBorder;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -40,14 +37,11 @@ public class StackFrameComponent extends JPanel {
 
 		// Appliquer le tri en fonction du mode choisi
 		switch (mode) {
-			case ALPHABETICAL:
-				localEntries.sort(Comparator.comparing(Map.Entry::getKey));
-				break;
-			case LIFO:
+			case BOTTOMUP:
 				Collections.reverse(localEntries);
 				break;
-			case FIFO:
-				// FIFO : on conserve l'ordre d'insertion
+			case TOPDOWN:
+				// TOPDOWN : La premiere variable est la plus haute dans la pile
 				break;
 		}
 		// ---------------------
@@ -78,7 +72,9 @@ public class StackFrameComponent extends JPanel {
 		for (Map.Entry<String, Value> local : localEntries) {
 			// TYPE
 			String typeMode = PluginSettings.getTypeMode(); // "précis" ou "simplifié"
-			String typeName = (local.getValue().typeName != null) ? local.getValue().typeName : "<?>";
+			String typeName = local.getValue().declarationType != null
+					? local.getValue().declarationType
+					: "<?>";
 
 			if ("Simplifié".equals(typeMode)) {
 				// Simplification du nom du type
