@@ -112,6 +112,16 @@ public class StackFrameComponent extends JPanel {
 		locals.build();
 		locals.setBorder(new RoundedBorder(8));
 
+		// Ajout du nom de la méthode en bas du tableau
+		String shortName = frame.name; // Nom de la méthode
+		int idx = shortName.indexOf(':');
+		if (idx >= 0) {shortName = shortName.substring(0, idx);}
+		JLabel methodLabel = new JLabel(shortName);
+		methodLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		methodLabel.setFont(Constants.fontUISmall);
+		methodLabel.setForeground(Constants.colorHeapLabel);
+		add(methodLabel, BorderLayout.SOUTH);
+
 
 		add(locals);
 	}

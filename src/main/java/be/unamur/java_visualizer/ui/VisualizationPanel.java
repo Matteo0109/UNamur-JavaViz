@@ -3,7 +3,7 @@ package be.unamur.java_visualizer.ui;
 import be.unamur.java_visualizer.model.ExecutionTrace;
 import be.unamur.java_visualizer.model.Value;
 import be.unamur.java_visualizer.plugin.PluginSettings;
-import com.intellij.ui.JBColor; // Pour la couleur du frame courant
+import com.intellij.ui.JBColor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -79,7 +79,7 @@ public class VisualizationPanel extends JPanel {
 	private void refreshUI() {
 		if (trace == null) {
 			removeAll();
-			buildUI(); // Afficher le message "Aucun trace..."
+			buildUI();
 			revalidate();
 			repaint();
 			return;
