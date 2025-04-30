@@ -113,7 +113,7 @@ public class VisualizationPanel extends JPanel {
 		JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 2));
 		infoPanel.setOpaque(false);
 
-		JLabel currentFrameLabel = new CustomJLabel("Actuellement: " + currentFrameName + " ");
+		JLabel currentFrameLabel = new CustomJLabel(currentFrameName + " ");
 		currentFrameLabel.setFont(Constants.fontUIMono.deriveFont(Font.BOLD));
 		currentFrameLabel.setForeground(JBColor.BLUE);
 		infoPanel.add(currentFrameLabel);
