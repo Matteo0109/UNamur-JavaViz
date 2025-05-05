@@ -14,6 +14,7 @@ public class PluginSettings {
 
     public static void setSortMode(SortMode mode) {
         PropertiesComponent.getInstance().setValue(SORT_MODE_KEY, mode.name());
+        JavaVisualizerManager.getInstance().forceRefreshVisualizer();
     }
 
 
@@ -23,6 +24,7 @@ public class PluginSettings {
 
     public static void setTypeMode(String mode) {
         typeMode = mode;
+        PropertiesComponent.getInstance().setValue("java_visualizer.type_mode", mode);
     }
 
     public static String simplifyTypeName(String typeName) {

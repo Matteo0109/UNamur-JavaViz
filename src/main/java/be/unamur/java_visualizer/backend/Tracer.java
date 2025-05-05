@@ -42,6 +42,8 @@ import static be.unamur.java_visualizer.backend.TracerUtils.displayNameForType;
 import static be.unamur.java_visualizer.backend.TracerUtils.doesImplementInterface;
 import static be.unamur.java_visualizer.backend.TracerUtils.getIterator;
 import static be.unamur.java_visualizer.backend.TracerUtils.invokeSimple;
+import be.unamur.java_visualizer.plugin.PluginSettings;
+
 
 /**
  * Some code from traceprinter, written by David Pritchard (daveagp@gmail.com)
@@ -162,7 +164,6 @@ public class Tracer {
 				try {
 					Value val = convertValue(sf.getValue(lv));
 					val.declarationType = lv.typeName();
-					System.out.println("lv.name() = " + lv.name() + " lv.typeName() = " + lv.typeName());
 					output.locals.put(lv.name(), val);
 				} catch (IllegalArgumentException exc) {
 					System.out.println("That shouldn't happen!");
@@ -211,7 +212,6 @@ public class Tracer {
 						LocalVariable lv = me.getValue();
 						Value val = convertValue(sf.getValue(lv));
 						val.declarationType = lv.typeName();
-						System.out.println("lv.name() = " + lv.name() + " lv.typeName() = " + lv.typeName());
 						output.locals.put(lv.name(), val);
 					} catch (IllegalArgumentException exc) {
 						// variable not yet defined, don't list it
@@ -290,28 +290,27 @@ public class Tracer {
 				}
 				return out;
 
-			} else if (obj instanceof StringReference) {
-				String strVal = ((StringReference) obj).value();
+		} else if (obj instanceof StringReference) {
+			String strVal = ((StringReference) obj).value();
 
-				HeapPrimitive out = new HeapPrimitive();
-				out.type = HeapEntity.Type.PRIMITIVE;
+			HeapPrimitive out = new HeapPrimitive();
+			out.type  = HeapEntity.Type.PRIMITIVE;
 
-				// Le label qui apparaîtra en titre du cadre (ex. "String")
+			// En mode “Précis” on affiche le nom complet, sinon “String”
+			if ("Précis".equals(PluginSettings.getTypeMode())) {
+				out.label = obj.referenceType().name();        // => "java.lang.String"
+			} else {
 				out.label = "String";
-
-				// On stocke la vraie valeur dans out.value
-				out.value = new Value();
-				out.value.type = Value.Type.STRING;
-				out.value.stringValue = strVal;
-
-				return out;
 			}
 
-			String typeName = obj.referenceType().name();
-			System.out.println("convertObject314: " + typeName);
-			System.out.println("convertObject314 obj : " + obj);
+			out.value = new Value();
+			out.value.type        = Value.Type.STRING;
+			out.value.stringValue = strVal;
+			return out;
+		}
 
-			System.out.println("convertObject314 obj ref: " + obj.referenceType());
+
+		String typeName = obj.referenceType().name();
 
 			if ((doesImplementInterface(obj, "java.util.List")
 					|| doesImplementInterface(obj, "java.util.Set"))
@@ -388,7 +387,6 @@ public class Tracer {
 
 	private Value convertValue(com.sun.jdi.Value v) {
 		Value out = new Value();
-		System.out.println("convertValue: " + v);
 		if (v instanceof BooleanValue) {
 			out.type = Value.Type.BOOLEAN;
 			out.booleanValue = ((BooleanValue) v).value();
@@ -432,7 +430,6 @@ public class Tracer {
 			// on le traite comme un objet
 			out = convertReference((ObjectReference) v);
 			out.typeName = ((ObjectReference) v).referenceType().name();
-			System.out.println("434: " + out.typeName);
 
 		} else {
 			out.type = Value.Type.NULL;

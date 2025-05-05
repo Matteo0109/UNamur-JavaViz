@@ -28,13 +28,10 @@ public class ShowSettingsAction extends AnAction {
 
                 // Mise à jour du sens de la pile en fonction de la sélection
                 SortMode selectedMode;
-                switch (sensPile) {
-                    case "TOPDOWN":
-                        selectedMode = SortMode.TOPDOWN;
-                        break;
-                    default:
-                        selectedMode = SortMode.BOTTOMUP;
-                        break;
+                if (sensPile.equals(SortMode.BOTTOMUP.toDisplayString())) {
+                    selectedMode = SortMode.BOTTOMUP;
+                } else {
+                    selectedMode = SortMode.TOPDOWN;
                 }
                 PluginSettings.setSortMode(selectedMode);
 

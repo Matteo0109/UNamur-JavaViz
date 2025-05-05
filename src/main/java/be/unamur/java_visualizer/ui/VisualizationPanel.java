@@ -165,7 +165,7 @@ public class VisualizationPanel extends JPanel {
 		int verticalGapAfterInfo = Constants.padOuter / 2;
 		int contentWidth = stackWidth + Constants.padCenter + heapWidth;
 		int infoPanelWidth = infoPanel.getPreferredSize().width;
-		infoPanel.setBounds(padOuter, padOuter, Math.min(infoPanelWidth, contentWidth), infoPanelHeight);
+		infoPanel.setBounds(padOuter, padOuter, infoPanelWidth, infoPanelHeight);
 
 		int titlesStartY = padOuter + infoPanelHeight + verticalGapAfterInfo;
 		labelStack.setBounds(padOuter, titlesStartY, stackWidth, labelHeight);
