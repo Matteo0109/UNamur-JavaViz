@@ -26,6 +26,19 @@ public class StackFrameComponent extends JPanel {
 		setOpaque(false);
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
+		// Si aucune variable locale, on affiche un message et on sort
+		if (frame.locals.isEmpty()) {
+			JLabel emptyLabel = new CustomJLabel(
+					"La pile d’exécution est vide : aucune variable locale n’est initialisée à ce point.",
+					SwingConstants.CENTER
+			);
+			emptyLabel.setFont(Constants.fontUI);
+			emptyLabel.setForeground(Constants.colorText);
+			add(emptyLabel);
+			return;
+		}
+
+
 		// ---------------------
 		// AJOUT DU TRI DES VARIABLES
 		// ---------------------
