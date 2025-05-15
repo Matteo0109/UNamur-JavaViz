@@ -36,6 +36,7 @@ import com.sun.jdi.Method;
 
 
 
+
 import java.util.*;
 
 import static be.unamur.java_visualizer.backend.TracerUtils.displayNameForType;
@@ -64,6 +65,7 @@ public class Tracer {
 	private static final List<String> BOXED_TYPES = Arrays.asList("Byte", "Short", "Integer", "Long", "Float", "Double", "Character", "Boolean");
 	private static final boolean SHOW_ALL_FIELDS = false;
 	private static final List<ReferenceType> STATIC_LISTABLE = new ArrayList<>();
+
 
 	private ThreadReference thread;
 	private MainPane panel;
@@ -387,6 +389,12 @@ public class Tracer {
 
 	private Value convertValue(com.sun.jdi.Value v) {
 		Value out = new Value();
+		if (v == null) {
+			out.type     = Value.Type.NULL;
+			out.typeName = "null";
+			return out;
+		}
+
 		if (v instanceof BooleanValue) {
 			out.type = Value.Type.BOOLEAN;
 			out.booleanValue = ((BooleanValue) v).value();
