@@ -161,6 +161,13 @@ hs_err_pid*
 /build/
 build.gradle
 
+#Ignore icons folder
+icons/
+#ignore fonts folder
+fonts/
+
+#ignore sample_trace.json
+sample_trace.json
 # Ignore Gradle GUI config
 gradle-app.setting
 
