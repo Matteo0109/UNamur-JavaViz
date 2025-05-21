@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.SwingUtilities;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -49,11 +50,19 @@ public class ScreenshotAction extends AnAction {
             JFileChooser chooser = new JFileChooser();
             chooser.setDialogTitle("Enregistrer le screenshot");
             chooser.setSelectedFile(new File("visualisation.png"));
+			chooser.setFileFilter(new FileNameExtensionFilter("Images PNG", "png"));
+
             int ret = chooser.showSaveDialog(viz);
             if (ret == JFileChooser.APPROVE_OPTION) {
-                File out = chooser.getSelectedFile();
+                File chosen = chooser.getSelectedFile();
+				String path = chosen.getAbsolutePath();
+
+				// Si l'utilisateur n'a pas saisi .png, on l'ajoute
+				if (!path.toLowerCase().endsWith(".png")) {
+					chosen = new File(path + ".png");
+				}
                 try {
-                    ImageIO.write(img, "PNG", out);
+                    ImageIO.write(img, "PNG", chosen );
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
